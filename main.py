@@ -9,6 +9,7 @@ from custom.stackedWidget import StackedWidget
 from custom.treeView import FileSystemTreeView
 from custom.listWidgets import FuncListWidget, UsedListWidget
 from custom.graphicsView import GraphicsView
+from showdemo import PETViewer
 
 
 class MyApp(QMainWindow):
@@ -27,7 +28,10 @@ class MyApp(QMainWindow):
         self.funcListWidget = FuncListWidget(self)
         self.stackedWidget = StackedWidget(self)
         self.fileSystemTreeView = FileSystemTreeView(self)
-        self.graphicsView = GraphicsView(self)
+        # pet_file = 'patient001_4d_ed_es.nii'
+        # mri_file = 'patient001_4d_ed_es.nii'
+        # wm_file = 'patient001_4d_ed_es.nii'  
+        self.graphicsView = PETViewer()
 
         self.dock_file = QDockWidget(self)
         self.dock_file.setWidget(self.fileSystemTreeView)
@@ -63,6 +67,7 @@ class MyApp(QMainWindow):
         self.cur_img = None
 
     def update_image(self):
+        print("update_image_main")
         if self.src_img is None:
             return
         img = self.process_image()
@@ -70,12 +75,11 @@ class MyApp(QMainWindow):
         self.graphicsView.update_image(img)
 
     def change_image(self, img):
-        self.src_img = img
-        img = self.process_image()
-        self.cur_img = img
+        print("change_image_main")
         self.graphicsView.change_image(img)
 
     def process_image(self):
+        print("process_image_main")
         img = self.src_img.copy()
         for i in range(self.useListWidget.count()):
             img = self.useListWidget.item(i)(img)
