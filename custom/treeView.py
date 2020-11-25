@@ -28,7 +28,10 @@ class FileSystemTreeView(QTreeView, QDockWidget):
 
     def select_image(self, file_index):
         file_name = self.fileSystemModel.filePath(file_index)
-        if file_name.endswith('.nii.gz'):
+        if file_name.endswith(('.jpg', '.png', '.bmp')) and self.mainwindow.datatype == "png":
+            src_img = cv2.imdecode(np.fromfile(file_name, dtype=np.uint8), -1)
+            self.mainwindow.change_image(src_img)
+        if file_name.endswith('.nii.gz') and self.mainwindow.datatype == "lge":
             src_img = file_name
             self.mainwindow.change_image(src_img)
-
+        
