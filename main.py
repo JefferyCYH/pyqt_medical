@@ -1,109 +1,119 @@
 import sys
-import cv2
+from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-import matplotlib.pyplot as plt
-
-from custom.stackedWidget import StackedWidget
-from custom.treeView import FileSystemTreeView
-from custom.listWidgets import FuncListWidget, UsedListWidget
-from custom.graphicsView import GraphicsView
-from showdemo import PETViewer
+import cv2
+from SecondWindow import MyApp, MyApp_LGE
 
 
-class MyApp(QMainWindow):
-    def __init__(self):
-        super(MyApp, self).__init__()
-        self.tool_bar = self.addToolBar('工具栏')
-        self.action_right_rotate = QAction(QIcon("icons/右旋转.png"), "向右旋转90", self)
-        self.action_left_rotate = QAction(QIcon("icons/左旋转.png"), "向左旋转90°", self)
-        self.action_histogram = QAction(QIcon("icons/直方图.png"), "直方图", self)
-        self.action_right_rotate.triggered.connect(self.right_rotate)
-        self.action_left_rotate.triggered.connect(self.left_rotate)
-        self.action_histogram.triggered.connect(self.histogram)
-        self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate, self.action_histogram))
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+        # 按钮
+        self.button_switch = QPushButton('启动')
+        self.button_quit = QPushButton('退出')
 
-        self.useListWidget = UsedListWidget(self)
-        self.funcListWidget = FuncListWidget(self)
-        self.stackedWidget = StackedWidget(self)
-        self.fileSystemTreeView = FileSystemTreeView(self)
-        # pet_file = 'patient001_4d_ed_es.nii'
-        # mri_file = 'patient001_4d_ed_es.nii'
-        # wm_file = 'patient001_4d_ed_es.nii'  
-        self.graphicsView = PETViewer()
+        # 下拉菜单
+        self.demo_box = QComboBox(self)
+        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'SAX'}
 
-        self.dock_file = QDockWidget(self)
-        self.dock_file.setWidget(self.fileSystemTreeView)
-        self.dock_file.setTitleBarWidget(QLabel('目录'))
-        self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        # 图像
+        self.label_show_camera = QLabel()
+        self.label_show_logo = QLabel()
 
-        self.dock_func = QDockWidget(self)
-        self.dock_func.setWidget(self.funcListWidget)
-        self.dock_func.setTitleBarWidget(QLabel('图像操作'))
-        self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)
-
-        self.dock_used = QDockWidget(self)
-        self.dock_used.setWidget(self.useListWidget)
-        self.dock_used.setTitleBarWidget(QLabel('已选操作'))
-        self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)
-        self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)
-
-        self.dock_attr = QDockWidget(self)
-        self.dock_attr.setWidget(self.stackedWidget)
-        self.dock_attr.setTitleBarWidget(QLabel('属性'))
-        self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)
-        self.dock_attr.close()
-
-        self.setCentralWidget(self.graphicsView)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.dock_file)
-        self.addDockWidget(Qt.TopDockWidgetArea, self.dock_func)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.dock_used)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.dock_attr)
-
-        self.setWindowTitle('Opencv图像处理')
-        self.setWindowIcon(QIcon('icons/main.png'))
-        self.src_img = None
-        self.cur_img = None
-
-    def update_image(self):
-        print("update_image_main")
-        if self.src_img is None:
-            return
-        img = self.process_image()
-        self.cur_img = img
-        self.graphicsView.update_image(img)
-
-    def change_image(self, img):
-        print("change_image_main")
-        self.graphicsView.change_image(img)
-
-    def process_image(self):
-        print("process_image_main")
-        img = self.src_img.copy()
-        for i in range(self.useListWidget.count()):
-            img = self.useListWidget.item(i)(img)
-        return img
-
-    def right_rotate(self):
-        self.graphicsView.rotate(90)
-
-    def left_rotate(self):
-        self.graphicsView.rotate(-90)
-
-    def histogram(self):
-        color = ('b', 'g', 'r')
-        for i, col in enumerate(color):
-            histr = cv2.calcHist([self.cur_img], [i], None, [256], [0, 256])
-            histr = histr.flatten()
-            plt.plot(range(256), histr, color=col)
-            plt.xlim([0, 256])
-        plt.show()
+        self.set_slot()  # 连接槽函数
+        self.set_ui()  # 设置UI
 
 
-if __name__ == "__main__":
+    def quit(self):
+        """关闭软件"""
+        self.close()
+
+    def set_slot(self):
+        """连接槽函数"""
+        self.button_switch.clicked.connect(self.switch)
+        self.button_quit.clicked.connect(self.quit)
+
+
+    def set_ui(self):
+        """界面美化"""
+        # 美化按钮
+        for button in (self.button_switch, self.button_quit):
+            button.setStyleSheet("QPushButton{background:#000000;"
+                                 #"border:1px solid #DA251C;"
+                                 "color:white;"
+                                 "border-radius:5px;}"
+                                 "QPushButton:hover{background:#E0E0E0;}"
+                                 "QPushButton:pressed{background:#D0D0D0;}")
+            button.setFixedSize(100, 30)
+
+        # 美化下拉菜单
+        self.demo_box.setFixedSize(100, 30)
+        # self.demo_box.addItems(['PNG', 'LGE', '肾脏CT'])
+        self.demo_box.addItems([self.dictType.get(0), self.dictType.get(1), self.dictType.get(2)])
+        # self.demo_box.currentIndexChanged[str].connect(self.listchange)
+        self.demo_box.setStyleSheet("QLabel{background:#000000;"
+                                    "border:1px solid #DA251C;"
+                                    "border-radius:5px;}")
+
+        # 美化标题
+        self.label_show_logo.setFixedSize(800, 160)
+        img = cv2.cvtColor(cv2.imread('./LOGO.png'), cv2.COLOR_BGR2RGB)
+        logo = QImage(img.data, img.shape[1], img.shape[0], img.shape[1] * 3, QImage.Format_RGB888)
+        self.label_show_logo.setPixmap(QPixmap.fromImage(logo))
+        self.label_show_logo.setStyleSheet("QLabel{border:0px;}")
+
+        # 界面布局
+        buttons_layout = QGridLayout()
+        buttons_layout.addWidget(self.demo_box, 0, 0, 1, 1)
+        buttons_layout.addWidget(self.button_switch, 1, 0, 1, 1)
+        buttons_layout.addWidget(self.button_quit, 2, 0, 1, 1)
+
+        panel_layout = QHBoxLayout()
+        panel_layout.addWidget(self.label_show_logo)
+        panel_layout.addLayout(buttons_layout)
+
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.label_show_camera)
+        main_layout.addLayout(panel_layout)
+
+        widget = QWidget()
+        widget.setStyleSheet("QWidget{color:#FFFFFF;"
+                             "background:#000000;"
+                             "border:1px solid #CFCFCF;"
+                             "border-radius:10px;}")
+        widget.setLayout(main_layout)
+
+        self.setCentralWidget(widget)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        screen = QDesktopWidget().screenGeometry()
+        size = self.geometry()
+        self.move((screen.width() - size.width()) / 2, (screen.height() - size.height()) / 2)
+
+
+    def switch(self):
+        if self.demo_box.currentText() == 'PNG':
+            self.PNGwindow = MyApp()
+            # MainWindow.close(self)
+            self.PNGwindow.show()
+
+        elif self.demo_box.currentText() == 'LGE':
+            self.LGEwindow = MyApp_LGE()
+            # MainWindow.close(self)
+            self.LGEwindow.show()
+
+        else:
+            print('Wrong!')
+            raise RuntimeError('Wrong!')
+
+
+
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(open('./custom/styleSheet.qss', encoding='utf-8').read())
-    window = MyApp()
-    window.show()
+    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    UI = MainWindow()
+    UI.show()
     sys.exit(app.exec_())
