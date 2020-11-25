@@ -27,7 +27,6 @@ class PETViewer(QWidget):
         self.setLayout(layout)
     
     def change_image(self, image):
-        print("change_image_showdemo")
         pet_image = sitk.ReadImage(image)
 
         pet_arr = sitk.GetArrayFromImage(pet_image)

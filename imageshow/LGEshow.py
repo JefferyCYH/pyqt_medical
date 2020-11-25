@@ -17,7 +17,6 @@ class LGEView(QWidget):
     switch_window = pyqtSignal()
 
     def __init__(self):
-        print('开始')
         super().__init__()
         # self.setWindowTitle('LGE image')
         self.depth = SubLayout('depth')
@@ -28,10 +27,8 @@ class LGEView(QWidget):
 
 
     def change_image(self, image):
-        print('chang the image in LGEshow')
         LGE_arr, affine = load_nii(image)
         depth_max = LGE_arr.shape[2]
-        print('LGE_arr.shape[2]', LGE_arr.shape[2])
 
         self.depth.LGE_arr = LGE_arr
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
@@ -67,20 +64,16 @@ class SubLayout(QVBoxLayout):
 
 
     def changevalue(self, value):
-        print('改变value')
-        print(self.slideblock.value())
         self.slideblock.setValue(value)
         self.plotCanvas.plot(self.LGE_arr, value, cmap='gray')
         self.label.setText('Slice:' + str(value))
 
 
     def setdepth_max(self, slideblock, maximum):
-        print('maximum:', maximum)
         slideblock.setMaximum(maximum)
 
 
 class PlotCanvas(FigureCanvas):
-    print('创建plotcanvas')
 
     def __init__(self, parent=None, width=2, height=4, dpi=100):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
@@ -90,15 +83,12 @@ class PlotCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
     def plot(self, nii_arr, value, cmap='gray'):
-        print('plot')
         self.fig.clear()
         ax = self.fig.add_subplot(111)
         slice = nii_arr[:, :, value - 1]
         slice = np.transpose(slice)
         ax.imshow(slice, cmap=cmap)
-        print('xxxxxxxx')
         self.draw()
-        print('结束')
 
 
         # for i in range(value):
