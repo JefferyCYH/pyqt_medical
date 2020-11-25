@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import cv2
-from SecondWindow import MyApp, MyApp_LGE, MyApp_PETV
+from SecondWindow import MyApp, MyApp_LGE, MyApp_PETV, MyApp_RAW
 
 
 class MainWindow(QMainWindow):
@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
 
         # 下拉菜单
         self.demo_box = QComboBox(self)
-        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'PETV'}
+        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'PETV', 3:"RAW"}
 
         # 图像
         self.label_show_camera = QLabel()
@@ -50,7 +50,7 @@ class MainWindow(QMainWindow):
         # 美化下拉菜单
         self.demo_box.setFixedSize(100, 30)
         # self.demo_box.addItems(['PNG', 'LGE', '肾脏CT'])
-        self.demo_box.addItems([self.dictType.get(0), self.dictType.get(1), self.dictType.get(2)])
+        self.demo_box.addItems([self.dictType.get(0), self.dictType.get(1), self.dictType.get(2), self.dictType.get(3)])
         # self.demo_box.currentIndexChanged[str].connect(self.listchange)
         self.demo_box.setStyleSheet("QLabel{background:#000000;"
                                     "border:1px solid #DA251C;"
@@ -108,6 +108,11 @@ class MainWindow(QMainWindow):
             self.PETVwindow = MyApp_PETV()
             # MainWindow.close(self)
             self.PETVwindow.show()
+        
+        elif self.demo_box.currentText() == 'RAW':
+            self.RAWwindow = MyApp_RAW()
+            # MainWindow.close(self)
+            self.RAWwindow.show()
 
         else:
             print('Wrong!')

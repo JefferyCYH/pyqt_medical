@@ -37,3 +37,6 @@ class FileSystemTreeView(QTreeView, QDockWidget):
         elif file_name.endswith('.nii.gz') and self.mainwindow.datatype == "petv":
             src_img = file_name
             self.mainwindow.change_image(src_img)
+        elif file_name.endswith('.raw') and self.mainwindow.datatype == "raw":
+            src_img = file_name
+            self.mainwindow.change_image(src_img)
