@@ -23,18 +23,17 @@ class FileSystemTreeView(QTreeView, QDockWidget):
         self.setAnimated(True)
         # 选中不显示虚线
         self.setFocusPolicy(Qt.NoFocus)
-        self.doubleClicked.connect(self.select_image_nii)
         self.doubleClicked.connect(self.select_image)
         self.setMinimumWidth(200)
 
     def select_image(self, file_index):
         file_name = self.fileSystemModel.filePath(file_index)
-        if file_name.endswith(('.jpg', '.png', '.bmp')):
+        if file_name.endswith(('.jpg', '.png', '.bmp')) and self.mainwindow.datatype == "png":
             src_img = cv2.imdecode(np.fromfile(file_name, dtype=np.uint8), -1)
             self.mainwindow.change_image(src_img)
-
-    def select_image_nii(self, file_index):
-        file_name = self.fileSystemModel.filePath(file_index)
-        if file_name.endswith('.nii.gz'):
+        elif file_name.endswith('.nii.gz') and self.mainwindow.datatype == "lge":
+            src_img = file_name
+            self.mainwindow.change_image(src_img)
+        elif file_name.endswith('.nii.gz') and self.mainwindow.datatype == "petv":
             src_img = file_name
             self.mainwindow.change_image(src_img)

@@ -100,11 +100,8 @@ class MainWindow(QMainWindow):
             self.pngwindow.show()
 
         elif self.demo_box.currentText() == 'LGE':
-            print('创建MyApp_LGE')
             self.LGEwindow = MyApp_LGE()
-            print('关闭MainWindow')
             # MainWindow.close(self)
-            print('展示LGRshow')
             self.LGEwindow.show()
 
         elif self.demo_box.currentText() == 'PETV':
