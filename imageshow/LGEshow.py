@@ -29,6 +29,9 @@ class LGEView(QWidget):
     def change_image(self, image):
         LGE_arr, affine = load_nii(image)
         depth_max = LGE_arr.shape[2]
+        if len(LGE_arr.shape) != 3:
+            print("file mismatch!")
+            return
 
         self.depth.LGE_arr = LGE_arr
         self.depth.setdepth_max(self.depth.slideblock, depth_max)

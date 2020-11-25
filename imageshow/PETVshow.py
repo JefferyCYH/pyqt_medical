@@ -30,6 +30,9 @@ class PETViewer(QWidget):
         pet_image = sitk.ReadImage(image)
 
         pet_arr = sitk.GetArrayFromImage(pet_image)
+        if len(pet_arr.shape) != 4:
+            print("file mismatch!")
+            return
 
         sagittal_slice_max = pet_arr.shape[0]
         coronal_slice_max = pet_arr.shape[1]
