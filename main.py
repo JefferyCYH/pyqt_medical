@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import cv2
-from SecondWindow import MyApp, MyApp_LGE
+from SecondWindow import MyApp, MyApp_LGE, MyApp_PETV
 
 
 class MainWindow(QMainWindow):
@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
 
         # 下拉菜单
         self.demo_box = QComboBox(self)
-        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'SAX'}
+        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'PETV'}
 
         # 图像
         self.label_show_camera = QLabel()
@@ -95,14 +95,22 @@ class MainWindow(QMainWindow):
 
     def switch(self):
         if self.demo_box.currentText() == 'PNG':
-            self.PNGwindow = MyApp()
+            self.pngwindow = MyApp()
             # MainWindow.close(self)
-            self.PNGwindow.show()
+            self.pngwindow.show()
 
         elif self.demo_box.currentText() == 'LGE':
+            print('创建MyApp_LGE')
             self.LGEwindow = MyApp_LGE()
+            print('关闭MainWindow')
             # MainWindow.close(self)
+            print('展示LGRshow')
             self.LGEwindow.show()
+
+        elif self.demo_box.currentText() == 'PETV':
+            self.PETVwindow = MyApp_PETV()
+            # MainWindow.close(self)
+            self.PETVwindow.show()
 
         else:
             print('Wrong!')
