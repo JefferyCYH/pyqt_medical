@@ -95,9 +95,9 @@ class MainWindow(QMainWindow):
 
     def switch(self):
         if self.demo_box.currentText() == 'PNG':
-            self.pngwindow = MyApp()
+            self.PNGwindow = MyApp()
             # MainWindow.close(self)
-            self.pngwindow.show()
+            self.PNGwindow.show()
 
         elif self.demo_box.currentText() == 'LGE':
             self.LGEwindow = MyApp_LGE()

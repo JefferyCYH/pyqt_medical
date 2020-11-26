@@ -32,7 +32,6 @@ class LGEView(QWidget):
         if len(LGE_arr.shape) != 3:
             self.depth.label.setText('file mismatch!')
             return
-
         self.depth.LGE_arr = LGE_arr
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
 
@@ -73,7 +72,7 @@ class SubLayout(QVBoxLayout):
         else:
             message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
             message_box.exec_()
-
+            
 
     def setdepth_max(self, slideblock, maximum):
         slideblock.setMaximum(maximum)
@@ -96,22 +95,3 @@ class PlotCanvas(FigureCanvas):
         ax.imshow(slice, cmap=cmap)
         self.draw()
 
-
-        # for i in range(value):
-        #     print('画图')
-        #     slice = nii_arr[:, :, value-1]
-        #     slice = np.transpose(slice)
-        #     # slice = slice[::-1]
-        #     # slice = nib.viewers.OrthoSlicer3D(slice).show()
-        #     ax.imshow(slice, cmap=cmap)
-        #     self.draw()
-        #     print('结束')
-
-# if __name__ == '__main__':
-#     LGE_file = './Case_P099.nii.gz'
-#     LGE_file_GT = './Case_P099_GT.nii.gz'
-#     app = QApplication(sys.argv)
-#     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-#     example = LGEViewer(LGE_file)
-#     example.show()
-#     sys.exit(app.exec_())

@@ -1,10 +1,8 @@
-import sys
 import cv2
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import matplotlib.pyplot as plt
-
 from custom.stackedWidget import StackedWidget
 from custom.treeView import FileSystemTreeView
 from custom.listWidgets import FuncListWidget, UsedListWidget
@@ -141,7 +139,6 @@ class MyApp_LGE(QMainWindow):
         self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.dock_attr.close()
 
-        # self.setCentralWidget(self.graphicsView)
         self.setCentralWidget(self.LGEView)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.dock_file)
         self.addDockWidget(Qt.TopDockWidgetArea, self.dock_func)
@@ -183,7 +180,6 @@ class MyApp_LGE(QMainWindow):
         # self.graphicsView.rotate(-90)
         self.LGEView.rotate(-90)
 
-
 class MyApp_PETV(QMainWindow):
     def __init__(self):
         super(MyApp_PETV, self).__init__()
@@ -222,7 +218,6 @@ class MyApp_PETV(QMainWindow):
         self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.dock_attr.close()
 
-        # self.setCentralWidget(self.graphicsView)
         self.setCentralWidget(self.PETViewer)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.dock_file)
         self.addDockWidget(Qt.TopDockWidgetArea, self.dock_func)
@@ -240,8 +235,7 @@ class MyApp_PETV(QMainWindow):
             return
         img = self.process_image()
         self.cur_img = img
-        # self.graphicsView.update_image(img)
-        self.LGEView.update_image(img)
+        self.PETViewer.update_image(img)
 
     def change_image(self, img):
         # self.src_img = img
@@ -257,12 +251,11 @@ class MyApp_PETV(QMainWindow):
         return img
 
     def right_rotate(self):
-        # self.graphicsView.rotate(90)
-        self.LGEView.rotate(90)
+        self.PETViewer.rotate(90)
 
     def left_rotate(self):
         # self.graphicsView.rotate(-90)
-        self.LGEView.rotate(-90)
+        self.PETViewer.rotate(-90)
 
 class MyApp_RAW(QMainWindow):
     def __init__(self):
