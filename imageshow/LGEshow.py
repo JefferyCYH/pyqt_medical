@@ -30,12 +30,11 @@ class LGEView(QWidget):
         LGE_arr, affine = load_nii(image)
         depth_max = LGE_arr.shape[2]
         if len(LGE_arr.shape) != 3:
-            print("file mismatch!")
+            self.depth.label.setText('file mismatch!')
             return
 
         self.depth.LGE_arr = LGE_arr
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
-        return
 
 
 class SubLayout(QVBoxLayout):
@@ -68,8 +67,12 @@ class SubLayout(QVBoxLayout):
 
     def changevalue(self, value):
         self.slideblock.setValue(value)
-        self.plotCanvas.plot(self.LGE_arr, value, cmap='gray')
-        self.label.setText('Slice:' + str(value))
+        if self.LGE_arr is not None:
+            self.plotCanvas.plot(self.LGE_arr, value, cmap='gray')
+            self.label.setText('Slice:' + str(value))
+        else:
+            message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
+            message_box.exec_()
 
 
     def setdepth_max(self, slideblock, maximum):

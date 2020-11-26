@@ -31,7 +31,7 @@ class PETViewer(QWidget):
 
         pet_arr = sitk.GetArrayFromImage(pet_image)
         if len(pet_arr.shape) != 4:
-            print("file mismatch!")
+            self.depth.label.setText('file mismatch!')
             return
 
         sagittal_slice_max = pet_arr.shape[0]
@@ -44,7 +44,6 @@ class PETViewer(QWidget):
 
         self.sagittal.scrollbar_setmaximum(self.sagittal.scrollbar_time, sagittal_slice_max)
         self.sagittal.scrollbar_setmaximum(self.sagittal.scrollbar_slice, coronal_slice_max)
-        return
 
 
 class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
@@ -89,6 +88,9 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
             self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
+        else:
+            message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
+            message_box.exec_()
 
     def sliderMoved2(self, scrollbarName):
         self.axis2_value = self.sender().value()
@@ -97,6 +99,9 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
             self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
+        else:
+            message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
+            message_box.exec_()
 
     def scrollbar_setmaximum(self, scrollbar, maximum):
         scrollbar.setMaximum(maximum)

@@ -58,8 +58,12 @@ class SubLayout(QVBoxLayout):
 
     def changevalue(self, value):
         self.slideblock.setValue(value)
-        self.plotCanvas.plot(self.RAW_arr, value, cmap='gray')
-        self.label.setText('Slice:' + str(value))
+        if self.RAW_arr is not None:
+            self.plotCanvas.plot(self.RAW_arr, value, cmap='gray')
+            self.label.setText('Slice:' + str(value))
+        else:
+            message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
+            message_box.exec_()
 
 class PlotCanvas(FigureCanvas):
 
