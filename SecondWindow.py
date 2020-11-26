@@ -8,7 +8,7 @@ from custom.treeView import FileSystemTreeView
 from custom.listWidgets import FuncListWidget, UsedListWidget
 from custom.graphicsView import GraphicsView
 from imageshow.LGEshow import LGEView
-from imageshow.showdemo import PETViewer
+from imageshow.PETVshow import PETViewer
 
 
 class MyApp(QMainWindow):
