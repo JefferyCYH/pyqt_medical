@@ -17,7 +17,6 @@ class LGEView(QWidget):
     switch_window = pyqtSignal()
 
     def __init__(self):
-        print('开始')
         super().__init__()
         # self.setWindowTitle('LGE image')
         self.depth = SubLayout('depth')
@@ -30,10 +29,11 @@ class LGEView(QWidget):
     def change_image(self, image):
         LGE_arr, affine = load_nii(image)
         depth_max = LGE_arr.shape[2]
-
+        if len(LGE_arr.shape) != 3:
+            self.depth.label.setText('file mismatch!')
+            return
         self.depth.LGE_arr = LGE_arr
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
-        return
 
 
 class SubLayout(QVBoxLayout):
@@ -72,6 +72,7 @@ class SubLayout(QVBoxLayout):
         else:
             message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
             message_box.exec_()
+            
 
     def setdepth_max(self, slideblock, maximum):
         slideblock.setMaximum(maximum)
@@ -93,3 +94,4 @@ class PlotCanvas(FigureCanvas):
         slice = np.transpose(slice)
         ax.imshow(slice, cmap=cmap)
         self.draw()
+

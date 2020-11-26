@@ -27,10 +27,12 @@ class PETViewer(QWidget):
         self.setLayout(layout)
     
     def change_image(self, image):
-        print("change_image_showdemo")
         pet_image = sitk.ReadImage(image)
 
         pet_arr = sitk.GetArrayFromImage(pet_image)
+        if len(pet_arr.shape) != 4:
+            self.sagittal.label.setText('file mismatch!')
+            return
 
         sagittal_slice_max = pet_arr.shape[0]
         coronal_slice_max = pet_arr.shape[1]
@@ -42,7 +44,6 @@ class PETViewer(QWidget):
 
         self.sagittal.scrollbar_setmaximum(self.sagittal.scrollbar_time, sagittal_slice_max)
         self.sagittal.scrollbar_setmaximum(self.sagittal.scrollbar_slice, coronal_slice_max)
-        return
 
 
 class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
@@ -75,10 +76,15 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
         self.scrollbar_slice.sliderMoved.connect(lambda: self.sliderMoved2("scrollbar_{}".format(tag)))
         layout3.addWidget(self.scrollbar_slice)
 
+        layout4 = QHBoxLayout()
+        self.label = QLabel()
+        layout4.addWidget(self.label)
+
         self.layout = QVBoxLayout()
         self.layout.addLayout(layout1)
         self.layout.addLayout(layout2)
         self.layout.addLayout(layout3)
+        self.layout.addLayout(layout4)
 
     def sliderMoved(self, scrollbarName):
         self.axis1_value = self.sender().value()
@@ -87,6 +93,10 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
             self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
+            self.label.setText('Frame:' + str(self.axis1_value) + 'Slice:' + str(self.axis2_value))
+        else:
+            message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
+            message_box.exec_()
 
     def sliderMoved2(self, scrollbarName):
         self.axis2_value = self.sender().value()
@@ -95,6 +105,10 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
             self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
             self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
+            self.label.setText('Frame:' + str(self.axis1_value) + 'Slice:' + str(self.axis2_value))
+        else:
+            message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
+            message_box.exec_()
 
     def scrollbar_setmaximum(self, scrollbar, maximum):
         scrollbar.setMaximum(maximum)
