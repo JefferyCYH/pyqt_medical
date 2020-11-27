@@ -1,0 +1,4 @@
+
+*.pyc
+.idea/misc.xml
+.idea/opencv-pyqt5-master.iml
