@@ -7,6 +7,9 @@ from custom.stackedWidget import StackedWidget
 from custom.treeView import FileSystemTreeView
 from custom.listWidgets import FuncListWidget, UsedListWidget
 from custom.graphicsView import GraphicsView
+from LGEprocess.stackedWidget_LGE import StackedWidget_LGE
+from LGEprocess.listWidgets_LGE import FuncListWidget_LGE, UsedListWidget_LGE
+from LGEprocess.graphicsView_LGE import GraphicsView_LGE
 from imageshow.LGEshow import LGEView
 from imageshow.PETVshow import PETViewer
 from imageshow.RAWshow import RAWView
@@ -112,10 +115,11 @@ class MyApp_LGE(QMainWindow):
         self.action_left_rotate.triggered.connect(self.left_rotate)
         self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate))
 
-        self.useListWidget = UsedListWidget(self)
-        self.funcListWidget = FuncListWidget(self)
-        self.stackedWidget = StackedWidget(self)
+        self.useListWidget_LGE = UsedListWidget_LGE(self)
+        self.funcListWidget_LGE = FuncListWidget_LGE(self)
+        self.stackedWidget_LGE = StackedWidget_LGE(self)
         self.fileSystemTreeView = FileSystemTreeView(self)
+        self.graphicsView_lge = GraphicsView_LGE(self)
         self.LGEView = LGEView()
 
         self.dock_file = QDockWidget(self)
@@ -124,17 +128,17 @@ class MyApp_LGE(QMainWindow):
         self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_func = QDockWidget(self)
-        self.dock_func.setWidget(self.funcListWidget)
+        self.dock_func.setWidget(self.funcListWidget_LGE)
         self.dock_func.setTitleBarWidget(QLabel('图像操作'))
         self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_used = QDockWidget(self)
-        self.dock_used.setWidget(self.useListWidget)
+        self.dock_used.setWidget(self.useListWidget_LGE)
         self.dock_used.setTitleBarWidget(QLabel('已选操作'))
         self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_attr = QDockWidget(self)
-        self.dock_attr.setWidget(self.stackedWidget)
+        self.dock_attr.setWidget(self.stackedWidget_LGE)
         self.dock_attr.setTitleBarWidget(QLabel('属性'))
         self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.dock_attr.close()
@@ -166,10 +170,17 @@ class MyApp_LGE(QMainWindow):
         # self.graphicsView.change_image(img)
         self.LGEView.change_image(img)
 
+    def change_label(self, label):
+        # self.src_img = img
+        # img = self.process_image()
+        # self.cur_img = img
+        # self.graphicsView.change_image(img)
+        self.LGEView.change_label(label)
+
     def process_image(self):
         img = self.src_img.copy()
-        for i in range(self.useListWidget.count()):
-            img = self.useListWidget.item(i)(img)
+        for i in range(self.useListWidget_LGE.count()):
+            img = self.useListWidget_LGE.item(i)(img)
         return img
 
     def right_rotate(self):

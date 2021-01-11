@@ -2,10 +2,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from config import items
+from LGEprocess.config_LGE import items
 
 
-class MyListWidget(QListWidget):
+class MyListWidget_LGE(QListWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.mainwindow = parent
@@ -15,7 +15,7 @@ class MyListWidget(QListWidget):
         self.setFocusPolicy(Qt.NoFocus)
 
 
-class UsedListWidget(MyListWidget):
+class UsedListWidget_LGE(MyListWidget_LGE):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setAcceptDrops(True)
@@ -29,7 +29,7 @@ class UsedListWidget(MyListWidget):
 
     def contextMenuEvent(self, e):
         # 右键菜单事件
-        print('右键菜单事件')
+        print('右键菜单事件LGE')
         item = self.itemAt(self.mapFromGlobal(QCursor.pos()))
         if not item: return  # 判断是否是空白区域
         menu = QMenu()
@@ -49,18 +49,18 @@ class UsedListWidget(MyListWidget):
         self.mainwindow.update_image()
 
     def show_attr(self):
-        print('选中操作')
+        print('选中操作LGE')
         item = self.itemAt(self.mapFromGlobal(QCursor.pos()))
         if not item: return
         param = item.get_params()  # 获取当前item的属性
         if type(item) in items:
             index = items.index(type(item))  # 获取item对应的table索引
-            self.mainwindow.stackedWidget.setCurrentIndex(index)
-            self.mainwindow.stackedWidget.currentWidget().update_params(param)  # 更新对应的table
+            self.mainwindow.stackedWidget_LGE.setCurrentIndex(index)
+            self.mainwindow.stackedWidget_LGE.currentWidget().update_params(param)  # 更新对应的table
             self.mainwindow.dock_attr.show()
 
 
-class FuncListWidget(MyListWidget):
+class FuncListWidget_LGE(MyListWidget_LGE):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setFixedHeight(64)
@@ -76,8 +76,9 @@ class FuncListWidget(MyListWidget):
         func_item = self.currentItem()
         if type(func_item) in items:
             use_item = type(func_item)()
-            self.mainwindow.useListWidget.addItem(use_item)
+            self.mainwindow.useListWidget_LGE.addItem(use_item)
             self.mainwindow.update_image()
+            print('使用函数LGE')
 
     def enterEvent(self, event):
         self.setCursor(Qt.PointingHandCursor)

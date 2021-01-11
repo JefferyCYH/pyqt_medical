@@ -35,6 +35,13 @@ class LGEView(QWidget):
         self.depth.LGE_arr = LGE_arr
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
 
+    def change_label(self, label):
+        print('chang label in LGEshow')
+        LGE_label, affine = load_nii(label)
+        depth_max = LGE_label.shape[2]
+        self.depth.LGE_label = LGE_label
+        self.depth.setdepth_max(self.depth.slideblock, depth_max)
+
 
 class SubLayout(QVBoxLayout):
     def __init__(self, tag):

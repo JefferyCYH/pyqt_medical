@@ -58,13 +58,13 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
         self.axis2_value = 0
         layout1 = QHBoxLayout()
         self.plotCanvas1 = PlotCanvas(self, width=2, height=2)
-        # self.plotCanvas2 = PlotCanvas(self, width=2, height=2)
-        # self.plotCanvas3 = PlotCanvas(self, width=2, height=2)
-        # self.plotCanvas4 = PlotCanvas(self, width=2, height=2)
+        self.plotCanvas2 = PlotCanvas(self, width=2, height=2)
+        self.plotCanvas3 = PlotCanvas(self, width=2, height=2)
+        self.plotCanvas4 = PlotCanvas(self, width=2, height=2)
         layout1.addWidget(self.plotCanvas1)
-        # layout1.addWidget(self.plotCanvas2)
-        # layout1.addWidget(self.plotCanvas3)
-        # layout1.addWidget(self.plotCanvas4)
+        layout1.addWidget(self.plotCanvas2)
+        layout1.addWidget(self.plotCanvas3)
+        layout1.addWidget(self.plotCanvas4)
 
         layout2 = QHBoxLayout()
         self.scrollbar_time = QScrollBar(Qt.Horizontal)
@@ -89,10 +89,10 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
     def sliderMoved(self, scrollbarName):
         self.axis1_value = self.sender().value()
         if not self.pet_arr is None:
-            self.plotCanvas1.plot(scrollbarName, self.pet_arr, self.axis1_value, self.axis2_value, cmap='gray')
-            # self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
-            # self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
-            # self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
+            self.plotCanvas1.plot(scrollbarName, self.pet_arr, self.axis1_value, self.axis2_value, cmap='jet')
+            self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
+            self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
+            self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
             self.label.setText('Frame:' + str(self.axis1_value) + 'Slice:' + str(self.axis2_value))
         else:
             message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
@@ -101,10 +101,10 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
     def sliderMoved2(self, scrollbarName):
         self.axis2_value = self.sender().value()
         if not self.pet_arr is None:
-            self.plotCanvas1.plot(scrollbarName, self.pet_arr, self.axis1_value, self.axis2_value, cmap='gray')
-            # self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
-            # self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
-            # self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
+            self.plotCanvas1.plot(scrollbarName, self.pet_arr, self.axis1_value, self.axis2_value, cmap='jet')
+            self.plotCanvas2.plot(scrollbarName, self.mri_arr, self.axis1_value, self.axis2_value, cmap='gray')
+            self.plotCanvas3.plot(scrollbarName, self.wm_arr, self.axis1_value, self.axis2_value, cmap='gray')
+            self.plotCanvas4.plot(scrollbarName, self.rm_arr, self.axis1_value, self.axis2_value, cmap='jet')
             self.label.setText('Frame:' + str(self.axis1_value) + 'Slice:' + str(self.axis2_value))
         else:
             message_box = QMessageBox(QMessageBox.Warning, '提示', '请选择图像')
