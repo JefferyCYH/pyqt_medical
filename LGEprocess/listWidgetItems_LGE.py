@@ -3,7 +3,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QListWidgetItem, QPushButton
 from LGEprocess.flags_LGE import *
-
+from skimage import exposure, img_as_float
 
 class MyItem_LGE(QListWidgetItem):
     def __init__(self, name=None, parent=None):
@@ -39,15 +39,24 @@ class NormItem(MyItem_LGE):
         super(NormItem, self).__init__('归一化', parent=parent)
 
     def __call__(self, img):
-
+        max = img.max()
+        min = img.min()
+        img = (img - min) / (max - min)
         return img
 
 class LightItem(MyItem_LGE):
     def __init__(self, parent=None):
         super(LightItem, self).__init__('亮度', parent=parent)
+        self.alpha = 1
 
     def __call__(self, img):
-
+        img = img_as_float(img)
+        if (self.alpha <=1 & self.alpha >0):
+            img = exposure.adjust_gamma(img, self.alpha)  # 图片调暗
+        elif (self.alpha > 1):
+            img = exposure.adjust_gamma(img, 0.5)  # 图片调亮
+        else:
+            print('请输入大于0的数字！')
         return img
 
 class ROIItem(MyItem_LGE):

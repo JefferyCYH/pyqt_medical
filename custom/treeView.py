@@ -1,8 +1,14 @@
 import cv2
 import numpy as np
-
+import nibabel as nib
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+
+def load_nii(path):
+    image = nib.load(path)
+    affine = image.affine
+    image = np.asarray(image.dataobj)
+    return image, affine
 
 
 class FileSystemTreeView(QTreeView, QDockWidget):
@@ -32,6 +38,7 @@ class FileSystemTreeView(QTreeView, QDockWidget):
             src_img = cv2.imdecode(np.fromfile(file_name, dtype=np.uint8), -1)
             self.mainwindow.change_image(src_img)
         elif file_name.endswith('.nii.gz') and self.mainwindow.datatype == "lge":
+            # src_img, affine = load_nii(file_name)
             src_img = file_name
             self.mainwindow.change_image(src_img)
         elif file_name.endswith('.nii.gz') and self.mainwindow.datatype == "petv":

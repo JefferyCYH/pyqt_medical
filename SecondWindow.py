@@ -157,21 +157,24 @@ class MyApp_LGE(QMainWindow):
 
     def update_image(self):
         if self.src_img is None:
+            print('None了')
             return
+        print('没有None')
         img = self.process_image()
         self.cur_img = img
         # self.graphicsView.update_image(img)
         self.LGEView.update_image(img)
 
     def change_image(self, img):
-        # self.src_img = img
+        self.src_img = img
+        print('src_img is True')
         # img = self.process_image()
         # self.cur_img = img
         # self.graphicsView.change_image(img)
         self.LGEView.change_image(img)
 
     def change_label(self, label):
-        # self.src_img = img
+        self.src_img = label
         # img = self.process_image()
         # self.cur_img = img
         # self.graphicsView.change_image(img)
