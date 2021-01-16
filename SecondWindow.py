@@ -68,6 +68,7 @@ class MyApp(QMainWindow):
         self.cur_img = None
 
     def update_image(self):
+        print('update')
         if self.src_img is None:
             return
         img = self.process_image()
@@ -75,12 +76,14 @@ class MyApp(QMainWindow):
         self.graphicsView.update_image(img)
 
     def change_image(self, img):
+        print('change')
         self.src_img = img
         img = self.process_image()
         self.cur_img = img
         self.graphicsView.change_image(img)
 
     def process_image(self):
+        print('process')
         img = self.src_img.copy()
         for i in range(self.useListWidget.count()):
             img = self.useListWidget.item(i)(img)
@@ -156,31 +159,31 @@ class MyApp_LGE(QMainWindow):
 
 
     def update_image(self):
+        print('update')
         if self.src_img is None:
-            print('None了')
             return
-        print('没有None')
         img = self.process_image()
         self.cur_img = img
         # self.graphicsView.update_image(img)
-        self.LGEView.update_image(img)
+        self.LGEView.change_image(img)
 
     def change_image(self, img):
-        self.src_img = img
         print('src_img is True')
-        # img = self.process_image()
-        # self.cur_img = img
+        self.src_img = img
+        img = self.process_image()
+        self.cur_img = img
         # self.graphicsView.change_image(img)
         self.LGEView.change_image(img)
 
     def change_label(self, label):
         self.src_img = label
-        # img = self.process_image()
-        # self.cur_img = img
+        img = self.process_image()
+        self.cur_img = img
         # self.graphicsView.change_image(img)
         self.LGEView.change_label(label)
 
     def process_image(self):
+        print('process')
         img = self.src_img.copy()
         for i in range(self.useListWidget_LGE.count()):
             img = self.useListWidget_LGE.item(i)(img)
@@ -331,9 +334,9 @@ class MyApp_RAW(QMainWindow):
         self.RAWView.update_image(img)
 
     def change_image(self, img):
-        # self.src_img = img
-        # img = self.process_image()
-        # self.cur_img = img
+        self.src_img = img
+        img = self.process_image()
+        self.cur_img = img
         # self.graphicsView.change_image(img)
         self.RAWView.change_image(img)
 
