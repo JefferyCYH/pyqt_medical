@@ -15,6 +15,8 @@ class MyListWidget_LGE(QListWidget):
         self.setFocusPolicy(Qt.NoFocus)
 
 
+
+
 class UsedListWidget_LGE(MyListWidget_LGE):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -78,6 +80,8 @@ class FuncListWidget_LGE(MyListWidget_LGE):
             use_item = type(func_item)()
             self.mainwindow.useListWidget_LGE.addItem(use_item)
             self.mainwindow.update_image()
+
+
             print('使用函数LGE')
 
     def enterEvent(self, event):
