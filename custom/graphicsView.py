@@ -52,6 +52,7 @@ class GraphicsView(QGraphicsView):
         return QPixmap.fromImage(image)
 
     def update_image(self, img):
+        print('update_img')
         self._empty = False
         self._photo.setPixmap(self.img_to_pixmap(img))
 
