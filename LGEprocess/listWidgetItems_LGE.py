@@ -4,7 +4,40 @@ from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QListWidgetItem, QPushButton
 from LGEprocess.flags_LGE import *
 from skimage import exposure, img_as_float
+import torch.utils.data as Datas
+from LGEprocess import Network as Network
+import os
+import torch
+def Seg(img):
+    print(img.shape)
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    device = torch.device("cuda:0")
+    print(torch.__version__)
+    data=img
+    dataloder = Datas.DataLoader(dataset=data, batch_size=1, shuffle=False)
+    Segnet = Network.DenseBiasNet(n_channels=1, n_classes=4).to(device)
 
+    pretrained_dict = torch.load('./model/net_epoch_source-Seg-Network.pkl', map_location='cpu')
+    model_dict = Segnet.state_dict()
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+    model_dict.update(pretrained_dict)
+    Segnet.load_state_dict(model_dict)
+
+    with torch.no_grad():
+        for epoch in range(1):
+            for step, (img) in enumerate(dataloder):
+                print(img.shape)
+                img=img.to(device).float()
+                print(img.shape)
+                img=Segnet(img)
+    img= img[0, 1, :, :, :] * 1 + img[0, 2, :, :, :] * 2 + img[0, 3, :, :, :] * 3
+    img = img.data.cpu().numpy()
+    print(img.shape)
+    return img
+def normor(image):
+    image -=image.mean()
+    image /=image.std()
+    return image
 class MyItem_LGE(QListWidgetItem):
     def __init__(self, name=None, parent=None):
         super(MyItem_LGE, self).__init__(name, parent=parent)
@@ -65,15 +98,22 @@ class ROIItem(MyItem_LGE):
 
     def __call__(self, img):
 
-        return img
 
+        return img
 
 
 class SegItem(MyItem_LGE):
     def __init__(self, parent=None):
         super(SegItem, self).__init__('分割', parent=parent)
-
+        print('img')
     def __call__(self, img):
+        img = np.transpose(img, (2, 1, 0))  # xyz-zyx
+        img=normor(img)
+        img = img[np.newaxis,np.newaxis, :, :, :]
+        # print(img.shape)
+        img=Seg(img)
+        img=np.transpose(img,(2,1,0))#zyx-xyz
+        print(img.shape)
 
         return img
 
