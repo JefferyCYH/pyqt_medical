@@ -25,14 +25,25 @@ class LGEView(QWidget):
         layout.addLayout(self.depth.layout)
         self.setLayout(layout)
 
-
-    def change_image(self, image):
-        LGE_arr, affine = load_nii(image)
-        depth_max = LGE_arr.shape[2]
-        if len(LGE_arr.shape) != 3:
+    def update_image(self, img):
+        self._empty = False
+        print(img.shape)
+        # self.img=img
+        depth_max = img.shape[2]
+        if len(img.shape) != 3:
             self.depth.label.setText('file mismatch!')
             return
-        self.depth.LGE_arr = LGE_arr
+        self.depth.LGE_arr = img
+        self.depth.setdepth_max(self.depth.slideblock, depth_max)
+
+
+    def change_image(self, image):
+        # LGE_arr, affine = load_nii(image)
+        depth_max = image.shape[2]
+        if len(image.shape) != 3:
+            self.depth.label.setText('file mismatch!')
+            return
+        self.depth.LGE_arr = image
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
 
     def change_label(self, label):
