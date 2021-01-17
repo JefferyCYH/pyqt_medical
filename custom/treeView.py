@@ -39,7 +39,7 @@ class FileSystemTreeView(QTreeView, QDockWidget):
             src_img = cv2.imdecode(np.fromfile(file_name, dtype=np.uint8), -1)
             self.mainwindow.change_image(src_img)
         elif file_name.endswith('.nii.gz') and self.mainwindow.datatype == "lge":
-            # src_img = file_name
+            src_img_name = file_name
             src_img, affine = load_nii(file_name)
             print(src_img.shape)
             # src_img = sitk.ReadImage(file_name)
