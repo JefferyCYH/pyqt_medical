@@ -79,15 +79,20 @@ def normor(image):
     return image
 
 def crop_img(label_es, img, box_height=128, box_width=128):
-    shape=label_es.shape()
     a = label_es.nonzero()
     a_x = a[0]
     a_x_middle = np.median(a[0])
     a_height = max((a_x)) - min((a_x)) + 1
 
     assert a_height < box_height, 'height小了'
-    a_x_start = int(a_x_middle - box_height / 2)
-    a_x_end = int(a_x_middle + box_height / 2)
+    a_x_start = max(0,int(a_x_middle - box_height / 2))
+    if(int(a_x_middle - box_height / 2)>=0):
+        a_x_end = int(a_x_middle + box_height / 2)
+    else:
+        a_x_end=box_height
+    print('axs',a_x_start)
+    print('axe',a_x_end)
+    print('x:',a_x_end-a_x_start)
 
     a_y = a[1]
     a_y_middle = np.median(a_y)
@@ -98,6 +103,7 @@ def crop_img(label_es, img, box_height=128, box_width=128):
     a_y_end = int(a_y_middle + box_width / 2)
 
     img_1 = img[a_x_start:a_x_end, a_y_start:a_y_end, :]
+    print('img1',img_1.shape)
     #plt.imshow(img_1[:,:,5], cmap='gray')
     return img_1
 
@@ -160,7 +166,12 @@ class ROIItem(MyItem_LGE):
         super(ROIItem, self).__init__('ROI提取', parent=parent)
 
     def __call__(self, img):
-
+        print(img.shape)
+        label_path='./image/patient081_frame01_gt.nii.gz'
+        label=nib.load(label_path).get_data()
+        print(label.shape)
+        img=crop_img(label_es=label,img=img,box_height=128,box_width=128)
+        print(img.shape)
 
         return img
 
