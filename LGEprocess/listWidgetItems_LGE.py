@@ -99,8 +99,11 @@ def crop_img(label_es, img, box_height=128, box_width=128):
     a_width = max(a_y) - min(a_y) + 1
     # print(a_width,a_height)
     assert a_width < box_width, 'width小了'
-    a_y_start = int(a_y_middle - box_width / 2)
-    a_y_end = int(a_y_middle + box_width / 2)
+    a_y_start = max(0,int(a_y_middle - box_width / 2))
+    if(int(a_y_middle - box_width / 2)>=0):
+        a_y_end = int(a_y_middle + box_width / 2)
+    else:
+        a_y_end=box_width
 
     img_1 = img[a_x_start:a_x_end, a_y_start:a_y_end, :]
     print('img1',img_1.shape)
