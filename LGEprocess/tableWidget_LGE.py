@@ -72,6 +72,10 @@ class ROITableWidget(TableWidget_LGE):
     def __init__(self, parent=None):
         super(ROITableWidget, self).__init__(parent=parent)
 
+class RegTableWidget(TableWidget_LGE):
+    def __init__(self, parent=None):
+        super(RegTableWidget, self).__init__(parent=parent)
+
 class SegTableWidget(TableWidget_LGE):
     def __init__(self, parent=None):
         super(SegTableWidget, self).__init__(parent=parent)
