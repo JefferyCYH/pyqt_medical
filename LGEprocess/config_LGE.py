@@ -8,6 +8,7 @@ items = [
     NormItem,
     LightItem,
     ROIItem,
+    RegItem,
     SegItem,
 ]
 
@@ -15,6 +16,7 @@ tables = [
     LabelTableWidget,
     NormTableWidget,
     ROITableWidget,
+    RegTableWidget,
     SegTableWidget,
 ]
 
