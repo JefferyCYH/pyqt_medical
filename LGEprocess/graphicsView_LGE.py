@@ -20,8 +20,11 @@ class GraphicsView_LGE(QGraphicsView):
         self.setMinimumSize(640, 480)
 
     def contextMenuEvent(self, event):
+        print('save')
         if not self.has_photo():
+            print('no')
             return
+        print('save')
         menu = QMenu()
         save_action = QAction('另存为', self)
         save_action.triggered.connect(self.save_current)  # 传递额外值
@@ -29,7 +32,8 @@ class GraphicsView_LGE(QGraphicsView):
         menu.exec(QCursor.pos())
 
     def save_current(self):
-        file_name = QFileDialog.getSaveFileName(self, '另存为', './', 'Image files(*.jpg *.gif *.png)')[0]
+        print('另存为')
+        file_name = QFileDialog.getSaveFileName(self, '另存为', './', 'Image files(*.jpg *.gif *.png *.nii.gz)')[0]
         print(file_name)
         if file_name:
             self._photo.pixmap().save(file_name)
