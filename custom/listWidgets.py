@@ -29,6 +29,7 @@ class UsedListWidget(MyListWidget):
 
     def contextMenuEvent(self, e):
         # 右键菜单事件
+        print('右键菜单事件')
         item = self.itemAt(self.mapFromGlobal(QCursor.pos()))
         if not item: return  # 判断是否是空白区域
         menu = QMenu()
@@ -48,6 +49,7 @@ class UsedListWidget(MyListWidget):
         self.mainwindow.update_image()
 
     def show_attr(self):
+        print('选中操作')
         item = self.itemAt(self.mapFromGlobal(QCursor.pos()))
         if not item: return
         param = item.get_params()  # 获取当前item的属性
