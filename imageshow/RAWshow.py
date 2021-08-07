@@ -21,8 +21,7 @@ class RAWView(QWidget):
 
 
     def change_image(self, image):
-        RAW_arr = np.fromfile(image, dtype=np.int16)
-        RAW_arr = np.reshape(RAW_arr, (200, 150, 150))
+        RAW_arr = image
 
         self.depth.RAW_arr = RAW_arr
 

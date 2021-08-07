@@ -7,12 +7,19 @@ from custom.stackedWidget import StackedWidget
 from custom.treeView import FileSystemTreeView
 from custom.listWidgets import FuncListWidget, UsedListWidget
 from custom.graphicsView import GraphicsView
+
 from LGEprocess.stackedWidget_LGE import StackedWidget_LGE
 from LGEprocess.listWidgets_LGE import FuncListWidget_LGE, UsedListWidget_LGE
 from LGEprocess.graphicsView_LGE import GraphicsView_LGE
+
 from FDCMRprocess.stackedWidget_4D import StackedWidget_4D
 from FDCMRprocess.listWidgets_4D import FuncListWidget_4D, UsedListWidget_4D
 from FDCMRprocess.graphicsView_4D import GraphicsView_4D
+
+from RAWprocess.stackedWidget_RAW import StackedWidget_RAW
+from RAWprocess.listWidgets_RAW import FuncListWidget_RAW, UsedListWidget_RAW
+from RAWprocess.graphicsView_RAW import GraphicsView_RAW
+from RAWprocess.treeView_RAW import FileSystemTreeView_RAW
 
 
 from imageshow.LGEshow import LGEView
@@ -290,10 +297,10 @@ class MyApp_RAW(QMainWindow):
         self.action_left_rotate.triggered.connect(self.left_rotate)
         self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate))
 
-        self.useListWidget = UsedListWidget(self)
-        self.funcListWidget = FuncListWidget(self)
-        self.stackedWidget = StackedWidget(self)
-        self.fileSystemTreeView = FileSystemTreeView(self)
+        self.useListWidget = UsedListWidget_RAW(self)
+        self.funcListWidget = FuncListWidget_RAW(self)
+        self.stackedWidget = StackedWidget_RAW(self)
+        self.fileSystemTreeView = FileSystemTreeView_RAW(self)
         self.RAWView = RAWView()
 
         self.dock_file = QDockWidget(self)
