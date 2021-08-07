@@ -1,0 +1,398 @@
+<html>
+<head>
+<title>SecondWindow.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #008080; font-weight: bold;}
+.s3 { color: #1750eb;}
+.s4 { color: #8c8c8c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+SecondWindow.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">cv2</span>
+<span class="s0">from </span><span class="s1">PyQt5.QtGui </span><span class="s0">import </span><span class="s1">*</span>
+<span class="s0">from </span><span class="s1">PyQt5.QtWidgets </span><span class="s0">import </span><span class="s1">*</span>
+<span class="s0">from </span><span class="s1">PyQt5.QtCore </span><span class="s0">import </span><span class="s1">*</span>
+<span class="s0">import </span><span class="s1">matplotlib.pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+<span class="s0">from </span><span class="s1">pandas </span><span class="s0">import </span><span class="s1">np</span>
+
+<span class="s0">from </span><span class="s1">custom.stackedWidget </span><span class="s0">import </span><span class="s1">StackedWidget</span>
+<span class="s0">from </span><span class="s1">custom.treeView </span><span class="s0">import </span><span class="s1">FileSystemTreeView</span>
+<span class="s0">from </span><span class="s1">custom.listWidgets </span><span class="s0">import </span><span class="s1">FuncListWidget, UsedListWidget</span>
+<span class="s0">from </span><span class="s1">custom.graphicsView </span><span class="s0">import </span><span class="s1">GraphicsView</span>
+<span class="s0">from </span><span class="s1">LGEprocess.stackedWidget_LGE </span><span class="s0">import </span><span class="s1">StackedWidget_LGE</span>
+<span class="s0">from </span><span class="s1">LGEprocess.listWidgets_LGE </span><span class="s0">import </span><span class="s1">FuncListWidget_LGE, UsedListWidget_LGE</span>
+<span class="s0">from </span><span class="s1">LGEprocess.graphicsView_LGE </span><span class="s0">import </span><span class="s1">GraphicsView_LGE</span>
+<span class="s0">from </span><span class="s1">imageshow.LGEshow </span><span class="s0">import </span><span class="s1">LGEView</span>
+<span class="s0">from </span><span class="s1">imageshow.PETVshow </span><span class="s0">import </span><span class="s1">PETViewer</span>
+<span class="s0">from </span><span class="s1">imageshow.RAWshow </span><span class="s0">import </span><span class="s1">RAWView</span>
+<span class="s0">import </span><span class="s1">SimpleITK </span><span class="s0">as </span><span class="s1">sitk</span>
+<span class="s0">import </span><span class="s1">nibabel </span><span class="s0">as </span><span class="s1">nib</span>
+
+<span class="s0">class </span><span class="s1">MyApp(QMainWindow):</span>
+    <span class="s0">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">super(MyApp, self).__init__()</span>
+        <span class="s1">self.datatype = </span><span class="s2">&quot;png&quot;</span>
+        <span class="s1">self.tool_bar = self.addToolBar(</span><span class="s2">'工具栏'</span><span class="s1">)</span>
+        <span class="s1">self.action_right_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/右旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向右旋转90&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_left_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/左旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向左旋转90°&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_histogram = QAction(QIcon(</span><span class="s2">&quot;icons/直方图.png&quot;</span><span class="s1">), </span><span class="s2">&quot;直方图&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_right_rotate.triggered.connect(self.right_rotate)</span>
+        <span class="s1">self.action_left_rotate.triggered.connect(self.left_rotate)</span>
+        <span class="s1">self.action_histogram.triggered.connect(self.histogram)</span>
+        <span class="s1">self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate, self.action_histogram))</span>
+
+        <span class="s1">self.useListWidget = UsedListWidget(self)</span>
+        <span class="s1">self.funcListWidget = FuncListWidget(self)</span>
+        <span class="s1">self.stackedWidget = StackedWidget(self)</span>
+        <span class="s1">self.fileSystemTreeView = FileSystemTreeView(self)</span>
+        <span class="s1">self.graphicsView = GraphicsView(self)</span>
+
+        <span class="s1">self.dock_file = QDockWidget(self)</span>
+        <span class="s1">self.dock_file.setWidget(self.fileSystemTreeView)</span>
+        <span class="s1">self.dock_file.setTitleBarWidget(QLabel(</span><span class="s2">'目录'</span><span class="s1">))</span>
+        <span class="s1">self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_func = QDockWidget(self)</span>
+        <span class="s1">self.dock_func.setWidget(self.funcListWidget)</span>
+        <span class="s1">self.dock_func.setTitleBarWidget(QLabel(</span><span class="s2">'图像操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_used = QDockWidget(self)</span>
+        <span class="s1">self.dock_used.setWidget(self.useListWidget)</span>
+        <span class="s1">self.dock_used.setTitleBarWidget(QLabel(</span><span class="s2">'已选操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+        <span class="s1">self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_attr = QDockWidget(self)</span>
+        <span class="s1">self.dock_attr.setWidget(self.stackedWidget)</span>
+        <span class="s1">self.dock_attr.setTitleBarWidget(QLabel(</span><span class="s2">'属性'</span><span class="s1">))</span>
+        <span class="s1">self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+        <span class="s1">self.dock_attr.close()</span>
+
+        <span class="s1">self.setCentralWidget(self.graphicsView)</span>
+        <span class="s1">self.addDockWidget(Qt.LeftDockWidgetArea, self.dock_file)</span>
+        <span class="s1">self.addDockWidget(Qt.TopDockWidgetArea, self.dock_func)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_used)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_attr)</span>
+
+        <span class="s1">self.setWindowTitle(</span><span class="s2">'医学图像处理'</span><span class="s1">)</span>
+        <span class="s1">self.setWindowIcon(QIcon(</span><span class="s2">'icons/main.png'</span><span class="s1">))</span>
+        <span class="s1">self.src_img = </span><span class="s0">None</span>
+        <span class="s1">self.cur_img = </span><span class="s0">None</span>
+
+    <span class="s0">def </span><span class="s1">update_image(self):</span>
+        <span class="s1">print(</span><span class="s2">'update'</span><span class="s1">)</span>
+        <span class="s0">if </span><span class="s1">self.src_img </span><span class="s0">is None</span><span class="s1">:</span>
+            <span class="s0">return</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s1">self.graphicsView.update_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">change_image(self, img):</span>
+        <span class="s1">print(</span><span class="s2">'change'</span><span class="s1">)</span>
+        <span class="s1">self.src_img = img</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s1">self.graphicsView.change_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">process_image(self):</span>
+        <span class="s1">print(</span><span class="s2">'process'</span><span class="s1">)</span>
+        <span class="s1">img = self.src_img.copy()</span>
+        <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range(self.useListWidget.count()):</span>
+            <span class="s1">img = self.useListWidget.item(i)(img)</span>
+        <span class="s0">return </span><span class="s1">img</span>
+
+    <span class="s0">def </span><span class="s1">right_rotate(self):</span>
+        <span class="s1">self.graphicsView.rotate(</span><span class="s3">90</span><span class="s1">)</span>
+
+    <span class="s0">def </span><span class="s1">left_rotate(self):</span>
+        <span class="s1">self.graphicsView.rotate(-</span><span class="s3">90</span><span class="s1">)</span>
+
+
+    <span class="s0">def </span><span class="s1">histogram(self):</span>
+        <span class="s1">color = (</span><span class="s2">'b'</span><span class="s1">, </span><span class="s2">'g'</span><span class="s1">, </span><span class="s2">'r'</span><span class="s1">)</span>
+        <span class="s0">for </span><span class="s1">i, col </span><span class="s0">in </span><span class="s1">enumerate(color):</span>
+            <span class="s1">histr = cv2.calcHist([self.cur_img], [i], </span><span class="s0">None</span><span class="s1">, [</span><span class="s3">256</span><span class="s1">], [</span><span class="s3">0</span><span class="s1">, </span><span class="s3">256</span><span class="s1">])</span>
+            <span class="s1">histr = histr.flatten()</span>
+            <span class="s1">plt.plot(range(</span><span class="s3">256</span><span class="s1">), histr, color=col)</span>
+            <span class="s1">plt.xlim([</span><span class="s3">0</span><span class="s1">, </span><span class="s3">256</span><span class="s1">])</span>
+        <span class="s1">plt.show()</span>
+
+
+
+<span class="s0">class </span><span class="s1">MyApp_LGE(QMainWindow):</span>
+    <span class="s0">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">super(MyApp_LGE, self).__init__()</span>
+        <span class="s1">self.datatype = </span><span class="s2">&quot;lge&quot;</span>
+        <span class="s1">self.tool_bar = self.addToolBar(</span><span class="s2">'工具栏'</span><span class="s1">)</span>
+        <span class="s1">self.action_right_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/右旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向右旋转90&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_left_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/左旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向左旋转90°&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_right_rotate.triggered.connect(self.right_rotate)</span>
+        <span class="s1">self.action_left_rotate.triggered.connect(self.left_rotate)</span>
+        <span class="s1">self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate))</span>
+
+        <span class="s1">self.useListWidget_LGE = UsedListWidget_LGE(self)</span>
+        <span class="s1">self.funcListWidget_LGE = FuncListWidget_LGE(self)</span>
+        <span class="s1">self.stackedWidget_LGE = StackedWidget_LGE(self)</span>
+        <span class="s1">self.fileSystemTreeView = FileSystemTreeView(self)</span>
+        <span class="s1">self.graphicsView_lge = GraphicsView_LGE(self)</span>
+        <span class="s1">self.LGEView = LGEView()</span>
+
+        <span class="s1">self.dock_file = QDockWidget(self)</span>
+        <span class="s1">self.dock_file.setWidget(self.fileSystemTreeView)</span>
+        <span class="s1">self.dock_file.setTitleBarWidget(QLabel(</span><span class="s2">'目录'</span><span class="s1">))</span>
+        <span class="s1">self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_func = QDockWidget(self)</span>
+        <span class="s1">self.dock_func.setWidget(self.funcListWidget_LGE)</span>
+        <span class="s1">self.dock_func.setTitleBarWidget(QLabel(</span><span class="s2">'图像操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_used = QDockWidget(self)</span>
+        <span class="s1">self.dock_used.setWidget(self.useListWidget_LGE)</span>
+        <span class="s1">self.dock_used.setTitleBarWidget(QLabel(</span><span class="s2">'已选操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_attr = QDockWidget(self)</span>
+        <span class="s1">self.dock_attr.setWidget(self.stackedWidget_LGE)</span>
+        <span class="s1">self.dock_attr.setTitleBarWidget(QLabel(</span><span class="s2">'属性'</span><span class="s1">))</span>
+        <span class="s1">self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+        <span class="s1">self.dock_attr.close()</span>
+
+        <span class="s1">self.setCentralWidget(self.LGEView)</span>
+        <span class="s1">self.addDockWidget(Qt.LeftDockWidgetArea, self.dock_file)</span>
+        <span class="s1">self.addDockWidget(Qt.TopDockWidgetArea, self.dock_func)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_used)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_attr)</span>
+
+        <span class="s1">self.setWindowTitle(</span><span class="s2">'医学图像处理'</span><span class="s1">)</span>
+        <span class="s1">self.setWindowIcon(QIcon(</span><span class="s2">'icons/main.png'</span><span class="s1">))</span>
+        <span class="s1">self.src_img = </span><span class="s0">None</span>
+        <span class="s1">self.cur_img = </span><span class="s0">None</span>
+
+    <span class="s0">def </span><span class="s1">contextMenuEvent(self, event):</span>
+        <span class="s1">print(</span><span class="s2">'save'</span><span class="s1">)</span>
+        <span class="s4"># if not self.has_photo():</span>
+        <span class="s4">#     print('no')</span>
+        <span class="s4">#     return</span>
+        <span class="s4"># print('save')</span>
+        <span class="s1">menu = QMenu()</span>
+        <span class="s1">save_action = QAction(</span><span class="s2">'另存为'</span><span class="s1">, self)</span>
+        <span class="s1">save_action.triggered.connect(self.save_current)  </span><span class="s4"># 传递额外值</span>
+        <span class="s1">menu.addAction(save_action)</span>
+        <span class="s1">menu.exec(QCursor.pos())</span>
+
+    <span class="s0">def </span><span class="s1">save_current(self):</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">print(</span><span class="s2">'另存为'</span><span class="s1">)</span>
+        <span class="s1">file_name = QFileDialog.getSaveFileName(self, </span><span class="s2">'另存为'</span><span class="s1">, </span><span class="s2">'./'</span><span class="s1">, </span><span class="s2">'Image files(*.nii.gz)'</span><span class="s1">)[</span><span class="s3">0</span><span class="s1">]</span>
+        <span class="s1">print(file_name)</span>
+        <span class="s0">if </span><span class="s1">file_name:</span>
+            <span class="s1">nib.Nifti1Image(img, np.eye(</span><span class="s3">4</span><span class="s1">)).to_filename(file_name)</span>
+
+    <span class="s0">def </span><span class="s1">update_image(self):</span>
+        <span class="s1">print(</span><span class="s2">'update'</span><span class="s1">)</span>
+        <span class="s0">if </span><span class="s1">self.src_img </span><span class="s0">is None</span><span class="s1">:</span>
+            <span class="s0">return</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s4"># self.graphicsView.update_image(img)</span>
+        <span class="s1">self.LGEView.change_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">change_image(self, img):</span>
+        <span class="s1">print(</span><span class="s2">'src_img is True'</span><span class="s1">)</span>
+        <span class="s1">self.src_img = img</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s4"># self.graphicsView.change_image(img)</span>
+        <span class="s1">self.LGEView.change_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">change_label(self, label):</span>
+        <span class="s1">self.src_img = label</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s4"># self.graphicsView.change_image(img)</span>
+        <span class="s1">self.LGEView.change_label(label)</span>
+
+    <span class="s0">def </span><span class="s1">process_image(self):</span>
+        <span class="s1">print(</span><span class="s2">'process'</span><span class="s1">)</span>
+        <span class="s1">img = self.src_img.copy()</span>
+        <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range(self.useListWidget_LGE.count()):</span>
+            <span class="s1">img = self.useListWidget_LGE.item(i)(img)</span>
+        <span class="s0">return </span><span class="s1">img</span>
+
+    <span class="s0">def </span><span class="s1">right_rotate(self):</span>
+        <span class="s4"># self.graphicsView.rotate(90)</span>
+        <span class="s1">self.LGEView.rotate(</span><span class="s3">90</span><span class="s1">)</span>
+
+    <span class="s0">def </span><span class="s1">left_rotate(self):</span>
+        <span class="s4"># self.graphicsView.rotate(-90)</span>
+        <span class="s1">self.LGEView.rotate(-</span><span class="s3">90</span><span class="s1">)</span>
+
+<span class="s0">class </span><span class="s1">MyApp_PETV(QMainWindow):</span>
+    <span class="s0">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">super(MyApp_PETV, self).__init__()</span>
+        <span class="s1">self.datatype = </span><span class="s2">&quot;petv&quot;</span>
+        <span class="s1">self.tool_bar = self.addToolBar(</span><span class="s2">'工具栏'</span><span class="s1">)</span>
+        <span class="s1">self.action_right_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/右旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向右旋转90&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_left_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/左旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向左旋转90°&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_right_rotate.triggered.connect(self.right_rotate)</span>
+        <span class="s1">self.action_left_rotate.triggered.connect(self.left_rotate)</span>
+        <span class="s1">self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate))</span>
+
+        <span class="s1">self.useListWidget = UsedListWidget(self)</span>
+        <span class="s1">self.funcListWidget = FuncListWidget(self)</span>
+        <span class="s1">self.stackedWidget = StackedWidget(self)</span>
+        <span class="s1">self.fileSystemTreeView = FileSystemTreeView(self)</span>
+        <span class="s1">self.PETViewer = PETViewer()</span>
+
+        <span class="s1">self.dock_file = QDockWidget(self)</span>
+        <span class="s1">self.dock_file.setWidget(self.fileSystemTreeView)</span>
+        <span class="s1">self.dock_file.setTitleBarWidget(QLabel(</span><span class="s2">'目录'</span><span class="s1">))</span>
+        <span class="s1">self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_func = QDockWidget(self)</span>
+        <span class="s1">self.dock_func.setWidget(self.funcListWidget)</span>
+        <span class="s1">self.dock_func.setTitleBarWidget(QLabel(</span><span class="s2">'图像操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_used = QDockWidget(self)</span>
+        <span class="s1">self.dock_used.setWidget(self.useListWidget)</span>
+        <span class="s1">self.dock_used.setTitleBarWidget(QLabel(</span><span class="s2">'已选操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_attr = QDockWidget(self)</span>
+        <span class="s1">self.dock_attr.setWidget(self.stackedWidget)</span>
+        <span class="s1">self.dock_attr.setTitleBarWidget(QLabel(</span><span class="s2">'属性'</span><span class="s1">))</span>
+        <span class="s1">self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+        <span class="s1">self.dock_attr.close()</span>
+
+        <span class="s1">self.setCentralWidget(self.PETViewer)</span>
+        <span class="s1">self.addDockWidget(Qt.LeftDockWidgetArea, self.dock_file)</span>
+        <span class="s1">self.addDockWidget(Qt.TopDockWidgetArea, self.dock_func)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_used)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_attr)</span>
+
+        <span class="s1">self.setWindowTitle(</span><span class="s2">'医学图像处理'</span><span class="s1">)</span>
+        <span class="s1">self.setWindowIcon(QIcon(</span><span class="s2">'icons/main.png'</span><span class="s1">))</span>
+        <span class="s1">self.src_img = </span><span class="s0">None</span>
+        <span class="s1">self.cur_img = </span><span class="s0">None</span>
+
+
+    <span class="s0">def </span><span class="s1">update_image(self):</span>
+        <span class="s0">if </span><span class="s1">self.src_img </span><span class="s0">is None</span><span class="s1">:</span>
+            <span class="s0">return</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s1">self.PETViewer.update_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">change_image(self, img):</span>
+        <span class="s4"># self.src_img = img</span>
+        <span class="s4"># img = self.process_image()</span>
+        <span class="s4"># self.cur_img = img</span>
+        <span class="s4"># self.graphicsView.change_image(img)</span>
+        <span class="s1">self.PETViewer.change_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">process_image(self):</span>
+        <span class="s1">img = self.src_img.copy()</span>
+        <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range(self.useListWidget.count()):</span>
+            <span class="s1">img = self.useListWidget.item(i)(img)</span>
+        <span class="s0">return </span><span class="s1">img</span>
+
+    <span class="s0">def </span><span class="s1">right_rotate(self):</span>
+        <span class="s1">self.PETViewer.rotate(</span><span class="s3">90</span><span class="s1">)</span>
+
+    <span class="s0">def </span><span class="s1">left_rotate(self):</span>
+        <span class="s4"># self.graphicsView.rotate(-90)</span>
+        <span class="s1">self.PETViewer.rotate(-</span><span class="s3">90</span><span class="s1">)</span>
+
+<span class="s0">class </span><span class="s1">MyApp_RAW(QMainWindow):</span>
+    <span class="s0">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">super(MyApp_RAW, self).__init__()</span>
+        <span class="s1">self.datatype = </span><span class="s2">&quot;raw&quot;</span>
+        <span class="s1">self.tool_bar = self.addToolBar(</span><span class="s2">'工具栏'</span><span class="s1">)</span>
+        <span class="s1">self.action_right_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/右旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向右旋转90&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_left_rotate = QAction(QIcon(</span><span class="s2">&quot;icons/左旋转.png&quot;</span><span class="s1">), </span><span class="s2">&quot;向左旋转90°&quot;</span><span class="s1">, self)</span>
+        <span class="s1">self.action_right_rotate.triggered.connect(self.right_rotate)</span>
+        <span class="s1">self.action_left_rotate.triggered.connect(self.left_rotate)</span>
+        <span class="s1">self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate))</span>
+
+        <span class="s1">self.useListWidget = UsedListWidget(self)</span>
+        <span class="s1">self.funcListWidget = FuncListWidget(self)</span>
+        <span class="s1">self.stackedWidget = StackedWidget(self)</span>
+        <span class="s1">self.fileSystemTreeView = FileSystemTreeView(self)</span>
+        <span class="s1">self.RAWView = RAWView()</span>
+
+        <span class="s1">self.dock_file = QDockWidget(self)</span>
+        <span class="s1">self.dock_file.setWidget(self.fileSystemTreeView)</span>
+        <span class="s1">self.dock_file.setTitleBarWidget(QLabel(</span><span class="s2">'目录'</span><span class="s1">))</span>
+        <span class="s1">self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_func = QDockWidget(self)</span>
+        <span class="s1">self.dock_func.setWidget(self.funcListWidget)</span>
+        <span class="s1">self.dock_func.setTitleBarWidget(QLabel(</span><span class="s2">'图像操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_used = QDockWidget(self)</span>
+        <span class="s1">self.dock_used.setWidget(self.useListWidget)</span>
+        <span class="s1">self.dock_used.setTitleBarWidget(QLabel(</span><span class="s2">'已选操作'</span><span class="s1">))</span>
+        <span class="s1">self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+
+        <span class="s1">self.dock_attr = QDockWidget(self)</span>
+        <span class="s1">self.dock_attr.setWidget(self.stackedWidget)</span>
+        <span class="s1">self.dock_attr.setTitleBarWidget(QLabel(</span><span class="s2">'属性'</span><span class="s1">))</span>
+        <span class="s1">self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)</span>
+        <span class="s1">self.dock_attr.close()</span>
+
+        <span class="s4"># self.setCentralWidget(self.graphicsView)</span>
+        <span class="s1">self.setCentralWidget(self.RAWView)</span>
+        <span class="s1">self.addDockWidget(Qt.LeftDockWidgetArea, self.dock_file)</span>
+        <span class="s1">self.addDockWidget(Qt.TopDockWidgetArea, self.dock_func)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_used)</span>
+        <span class="s1">self.addDockWidget(Qt.RightDockWidgetArea, self.dock_attr)</span>
+
+        <span class="s1">self.setWindowTitle(</span><span class="s2">'医学图像处理'</span><span class="s1">)</span>
+        <span class="s1">self.setWindowIcon(QIcon(</span><span class="s2">'icons/main.png'</span><span class="s1">))</span>
+        <span class="s1">self.src_img = </span><span class="s0">None</span>
+        <span class="s1">self.cur_img = </span><span class="s0">None</span>
+
+
+    <span class="s0">def </span><span class="s1">update_image(self):</span>
+        <span class="s0">if </span><span class="s1">self.src_img </span><span class="s0">is None</span><span class="s1">:</span>
+            <span class="s0">return</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s4"># self.graphicsView.update_image(img)</span>
+        <span class="s1">self.RAWView.update_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">change_image(self, img):</span>
+        <span class="s1">self.src_img = img</span>
+        <span class="s1">img = self.process_image()</span>
+        <span class="s1">self.cur_img = img</span>
+        <span class="s4"># self.graphicsView.change_image(img)</span>
+        <span class="s1">self.RAWView.change_image(img)</span>
+
+    <span class="s0">def </span><span class="s1">process_image(self):</span>
+        <span class="s1">img = self.src_img.copy()</span>
+        <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range(self.useListWidget.count()):</span>
+            <span class="s1">img = self.useListWidget.item(i)(img)</span>
+        <span class="s0">return </span><span class="s1">img</span>
+
+    <span class="s0">def </span><span class="s1">right_rotate(self):</span>
+        <span class="s4"># self.graphicsView.rotate(90)</span>
+        <span class="s1">self.RAWView.rotate(</span><span class="s3">90</span><span class="s1">)</span>
+
+    <span class="s0">def </span><span class="s1">left_rotate(self):</span>
+        <span class="s4"># self.graphicsView.rotate(-90)</span>
+        <span class="s1">self.RAWView.rotate(-</span><span class="s3">90</span><span class="s1">)</span>
+</pre>
+</body>
+</html>
