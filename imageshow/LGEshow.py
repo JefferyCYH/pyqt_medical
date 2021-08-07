@@ -5,8 +5,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import nibabel as nib
 import numpy as np
-import SimpleITK as sitk
-from LGEprocess.graphicsView_LGE import GraphicsView_LGE
 
 
 def load_nii(path):
@@ -22,40 +20,13 @@ class LGEView(QWidget):
         super().__init__()
         # self.setWindowTitle('LGE image')
         self.depth = SubLayout('depth')
-        # self._empty = True
-        # self.graphicsView_lge = GraphicsView_LGE(self)
 
         layout = QVBoxLayout()
         layout.addLayout(self.depth.layout)
         self.setLayout(layout)
 
-<<<<<<< Updated upstream
-=======
-    # def contextMenuEvent(self, event):
-    #     print('save')
-    #     # if not self.has_photo():
-    #     #     print('no')
-    #     #     return
-    #     # print('save')
-    #     menu = QMenu()
-    #     save_action = QAction('另存为', self)
-    #     save_action.triggered.connect(self.save_current)  # 传递额外值
-    #     menu.addAction(save_action)
-    #     menu.exec(QCursor.pos())
-    #
-    # def save_current(self,img):
-    #     print('另存为')
-    #     file_name = QFileDialog.getSaveFileName(self, '另存为', './', 'Image files(*.nii.gz)')[0]
-    #     print(file_name)
-    #     if file_name:
-    #         sitk.WriteImage(img,file_name)
-
-    # def has_photo(self):
-    #     return not self._empty
-
     def update_image(self, img):
         self._empty = False
-        print(img.shape)
         # self.img=img
         depth_max = img.shape[2]
         if len(img.shape) != 3:
@@ -64,15 +35,21 @@ class LGEView(QWidget):
         self.depth.LGE_arr = img
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
 
->>>>>>> Stashed changes
 
     def change_image(self, image):
-        LGE_arr, affine = load_nii(image)
-        depth_max = LGE_arr.shape[2]
-        if len(LGE_arr.shape) != 3:
+        # LGE_arr, affine = load_nii(image)
+        depth_max = image.shape[2]
+        if len(image.shape) != 3:
             self.depth.label.setText('file mismatch!')
             return
-        self.depth.LGE_arr = LGE_arr
+        self.depth.LGE_arr = image
+        self.depth.setdepth_max(self.depth.slideblock, depth_max)
+
+    def change_label(self, label):
+        print('chang label in LGEshow')
+        LGE_label, affine = load_nii(label)
+        depth_max = LGE_label.shape[2]
+        self.depth.LGE_label = LGE_label
         self.depth.setdepth_max(self.depth.slideblock, depth_max)
 
 
