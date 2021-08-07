@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import sys, os
 import PyQt5
 from PyQt5.QtCore import *
@@ -25,22 +23,22 @@ class PETViewer(QWidget):
         layout = QVBoxLayout()
         layout.addLayout(self.sagittal.layout)
         self.setLayout(layout)
-    
-    def change_image(self, image):
-        pet_image = sitk.ReadImage(image)
 
-        pet_arr = sitk.GetArrayFromImage(pet_image)
-        if len(pet_arr.shape) != 4:
+    def change_image(self, image):
+        # pet_image = sitk.ReadImage(image)
+        # pet_arr = sitk.GetArrayFromImage(pet_image)
+        image=np.transpose(image,(0,3,1,2))
+        if len(image.shape) != 4:
             self.sagittal.label.setText('file mismatch!')
             return
 
-        sagittal_slice_max = pet_arr.shape[0]
-        coronal_slice_max = pet_arr.shape[1]
+        sagittal_slice_max = image.shape[0]
+        coronal_slice_max = image.shape[1]
 
-        self.sagittal.pet_arr=pet_arr
-        self.sagittal.mri_arr=pet_arr
-        self.sagittal.wm_arr=pet_arr
-        self.sagittal.rm_arr=pet_arr
+        self.sagittal.pet_arr = image
+        self.sagittal.mri_arr = image
+        self.sagittal.wm_arr = image
+        self.sagittal.rm_arr = image
 
         self.sagittal.scrollbar_setmaximum(self.sagittal.scrollbar_time, sagittal_slice_max)
         self.sagittal.scrollbar_setmaximum(self.sagittal.scrollbar_slice, coronal_slice_max)
@@ -114,7 +112,6 @@ class SubLayout(PyQt5.QtWidgets.QVBoxLayout):
         scrollbar.setMaximum(maximum)
 
 
-
 class PlotCanvas(FigureCanvas):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -132,7 +129,7 @@ class PlotCanvas(FigureCanvas):
         # 依据scrollbar.value值，调整某一维の数值
 
         if scrollbarName == 'scrollbar_sagittal':
-            slice = nii_arr[value1-1, value-1, :, :]
+            slice = nii_arr[value1 - 1, value - 1, :, :]
 
         elif scrollbarName == 'scrollbar_coronal':
             slice = nii_arr[:, value - 1, :]
@@ -146,14 +143,3 @@ class PlotCanvas(FigureCanvas):
 
         ax.imshow(slice, cmap=cmap)
         self.draw()
-
-
-# if __name__ == '__main__':
-#     pet_file = 'patient001_4d_ed_es.nii'
-#     mri_file = 'patient001_4d_ed_es.nii'
-#     wm_file = 'patient001_4d_ed_es.nii'
-#     app = QApplication(sys.argv)
-#     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-#     example = PETViewer()
-#     example.show()
-#     sys.exit(app.exec_())
