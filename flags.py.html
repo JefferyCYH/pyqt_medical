@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>flags.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #1750eb;}
+.s3 { color: #8c8c8c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+flags.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">cv2</span>
+
+<span class="s1">GRAYING_STACKED_WIDGET = </span><span class="s2">0</span>
+<span class="s1">FILTER_STACKED_WIDGET = </span><span class="s2">1</span>
+<span class="s1">MORPH_STACKED_WIDGET = </span><span class="s2">2</span>
+<span class="s1">GRAD_STACKED_WIDGET = </span><span class="s2">3</span>
+<span class="s1">THRESH_STACKED_WIDGET = </span><span class="s2">4</span>
+<span class="s1">EDGE_STACKED_WIDGET = </span><span class="s2">5</span>
+
+<span class="s1">BGR2GRAY_COLOR = </span><span class="s2">0</span>
+<span class="s1">GRAY2BGR_COLOR = </span><span class="s2">1</span>
+<span class="s1">COLOR = {</span>
+    <span class="s1">BGR2GRAY_COLOR: cv2.COLOR_BGR2GRAY,</span>
+    <span class="s1">GRAY2BGR_COLOR: cv2.COLOR_GRAY2BGR</span>
+<span class="s1">}</span>
+
+<span class="s1">MEAN_FILTER = </span><span class="s2">0</span>
+<span class="s1">GAUSSIAN_FILTER = </span><span class="s2">1</span>
+<span class="s1">MEDIAN_FILTER = </span><span class="s2">2</span>
+
+<span class="s1">ERODE_MORPH_OP = </span><span class="s2">0</span>
+<span class="s1">DILATE_MORPH_OP = </span><span class="s2">1</span>
+<span class="s1">OPEN_MORPH_OP = </span><span class="s2">2</span>
+<span class="s1">CLOSE_MORPH_OP = </span><span class="s2">3</span>
+<span class="s1">GRADIENT_MORPH_OP = </span><span class="s2">4</span>
+<span class="s1">TOPHAT_MORPH_OP = </span><span class="s2">5</span>
+<span class="s1">BLACKHAT_MORPH_OP = </span><span class="s2">6</span>
+
+<span class="s1">MORPH_OP = {</span>
+    <span class="s1">ERODE_MORPH_OP: cv2.MORPH_ERODE,</span>
+    <span class="s1">DILATE_MORPH_OP: cv2.MORPH_DILATE,</span>
+    <span class="s1">OPEN_MORPH_OP: cv2.MORPH_OPEN,</span>
+    <span class="s1">CLOSE_MORPH_OP: cv2.MORPH_CLOSE,</span>
+    <span class="s1">GRADIENT_MORPH_OP: cv2.MORPH_GRADIENT,</span>
+    <span class="s1">TOPHAT_MORPH_OP: cv2.MORPH_TOPHAT,</span>
+    <span class="s1">BLACKHAT_MORPH_OP: cv2.MORPH_BLACKHAT</span>
+<span class="s1">}</span>
+
+<span class="s1">RECT_MORPH_SHAPE = </span><span class="s2">0</span>
+<span class="s1">CROSS_MORPH_SHAPE = </span><span class="s2">1</span>
+<span class="s1">ELLIPSE_MORPH_SHAPE = </span><span class="s2">2</span>
+
+<span class="s1">MORPH_SHAPE = {</span>
+    <span class="s1">RECT_MORPH_SHAPE: cv2.MORPH_RECT,</span>
+    <span class="s1">CROSS_MORPH_SHAPE: cv2.MORPH_CROSS,</span>
+    <span class="s1">ELLIPSE_MORPH_SHAPE: cv2.MORPH_ELLIPSE</span>
+<span class="s1">}</span>
+
+<span class="s1">SOBEL_GRAD = </span><span class="s2">0</span>
+<span class="s1">SCHARR_GRAD = </span><span class="s2">1</span>
+<span class="s1">LAPLACIAN_GRAD = </span><span class="s2">2</span>
+
+<span class="s1">BINARY_THRESH_METHOD = </span><span class="s2">0</span>
+<span class="s1">BINARY_INV_THRESH_METHOD = </span><span class="s2">1</span>
+<span class="s1">TRUNC_THRESH_METHOD = </span><span class="s2">2</span>
+<span class="s1">TOZERO_THRESH_METHOD = </span><span class="s2">3</span>
+<span class="s1">TOZERO_INV_THRESH_METHOD = </span><span class="s2">4</span>
+<span class="s1">OTSU_THRESH_METHOD = </span><span class="s2">5</span>
+<span class="s1">THRESH_METHOD = {</span>
+    <span class="s1">BINARY_THRESH_METHOD: cv2.THRESH_BINARY,  </span><span class="s3"># 0</span>
+    <span class="s1">BINARY_INV_THRESH_METHOD: cv2.THRESH_BINARY_INV,  </span><span class="s3"># 1</span>
+    <span class="s1">TRUNC_THRESH_METHOD: cv2.THRESH_TRUNC,  </span><span class="s3"># 2</span>
+    <span class="s1">TOZERO_THRESH_METHOD: cv2.THRESH_TOZERO,  </span><span class="s3"># 3</span>
+    <span class="s1">TOZERO_INV_THRESH_METHOD: cv2.THRESH_TOZERO_INV,  </span><span class="s3"># 4</span>
+    <span class="s1">OTSU_THRESH_METHOD: cv2.THRESH_OTSU  </span><span class="s3"># 5</span>
+<span class="s1">}</span>
+
+<span class="s1">EXTERNAL_CONTOUR_MODE = </span><span class="s2">0</span>
+<span class="s1">LIST_CONTOUR_MODE = </span><span class="s2">1</span>
+<span class="s1">CCOMP_CONTOUR_MODE = </span><span class="s2">2</span>
+<span class="s1">TREE_CONTOUR_MODE = </span><span class="s2">3</span>
+<span class="s1">CONTOUR_MODE = {</span>
+    <span class="s1">EXTERNAL_CONTOUR_MODE: cv2.RETR_EXTERNAL,</span>
+    <span class="s1">LIST_CONTOUR_MODE: cv2.RETR_LIST,</span>
+    <span class="s1">CCOMP_CONTOUR_MODE: cv2.RETR_CCOMP,</span>
+    <span class="s1">TREE_CONTOUR_MODE: cv2.RETR_TREE</span>
+<span class="s1">}</span>
+
+<span class="s1">NONE_CONTOUR_METHOD = </span><span class="s2">0</span>
+<span class="s1">SIMPLE_CONTOUR_METHOD = </span><span class="s2">1</span>
+<span class="s1">CONTOUR_METHOD = {</span>
+    <span class="s1">NONE_CONTOUR_METHOD: cv2.CHAIN_APPROX_NONE,</span>
+    <span class="s1">SIMPLE_CONTOUR_METHOD: cv2.CHAIN_APPROX_SIMPLE</span>
+<span class="s1">}</span>
+
+<span class="s1">NORMAL_CONTOUR = </span><span class="s2">0</span>
+<span class="s1">RECT_CONTOUR = </span><span class="s2">1</span>
+<span class="s1">MINRECT_CONTOUR = </span><span class="s2">2</span>
+<span class="s1">MINCIRCLE_CONTOUR = </span><span class="s2">3</span>
+
+
+<span class="s3"># 均衡化</span>
+<span class="s1">BLUE_CHANNEL = </span><span class="s2">0</span>
+<span class="s1">GREEN_CHANNEL = </span><span class="s2">1</span>
+<span class="s1">RED_CHANNEL = </span><span class="s2">2</span>
+<span class="s1">ALL_CHANNEL = </span><span class="s2">3</span>
+</pre>
+</body>
+</html>
