@@ -3,17 +3,22 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import matplotlib.pyplot as plt
-from pandas import np
-
 from custom.stackedWidget import StackedWidget
 from custom.treeView import FileSystemTreeView
 from custom.listWidgets import FuncListWidget, UsedListWidget
 from custom.graphicsView import GraphicsView
+from LGEprocess.stackedWidget_LGE import StackedWidget_LGE
+from LGEprocess.listWidgets_LGE import FuncListWidget_LGE, UsedListWidget_LGE
+from LGEprocess.graphicsView_LGE import GraphicsView_LGE
+from FDCMRprocess.stackedWidget_4D import StackedWidget_4D
+from FDCMRprocess.listWidgets_4D import FuncListWidget_4D, UsedListWidget_4D
+from FDCMRprocess.graphicsView_4D import GraphicsView_4D
+
+
 from imageshow.LGEshow import LGEView
 from imageshow.PETVshow import PETViewer
 from imageshow.RAWshow import RAWView
-import SimpleITK as sitk
-import nibabel as nib
+
 
 class MyApp(QMainWindow):
     def __init__(self):
@@ -68,6 +73,7 @@ class MyApp(QMainWindow):
         self.cur_img = None
 
     def update_image(self):
+        print('update')
         if self.src_img is None:
             return
         img = self.process_image()
@@ -75,12 +81,14 @@ class MyApp(QMainWindow):
         self.graphicsView.update_image(img)
 
     def change_image(self, img):
+        print('change')
         self.src_img = img
         img = self.process_image()
         self.cur_img = img
         self.graphicsView.change_image(img)
 
     def process_image(self):
+        print('process')
         img = self.src_img.copy()
         for i in range(self.useListWidget.count()):
             img = self.useListWidget.item(i)(img)
@@ -115,10 +123,11 @@ class MyApp_LGE(QMainWindow):
         self.action_left_rotate.triggered.connect(self.left_rotate)
         self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate))
 
-        self.useListWidget = UsedListWidget(self)
-        self.funcListWidget = FuncListWidget(self)
-        self.stackedWidget = StackedWidget(self)
+        self.useListWidget_LGE = UsedListWidget_LGE(self)
+        self.funcListWidget_LGE = FuncListWidget_LGE(self)
+        self.stackedWidget_LGE = StackedWidget_LGE(self)
         self.fileSystemTreeView = FileSystemTreeView(self)
+        self.graphicsView_lge = GraphicsView_LGE(self)
         self.LGEView = LGEView()
 
         self.dock_file = QDockWidget(self)
@@ -127,17 +136,17 @@ class MyApp_LGE(QMainWindow):
         self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_func = QDockWidget(self)
-        self.dock_func.setWidget(self.funcListWidget)
+        self.dock_func.setWidget(self.funcListWidget_LGE)
         self.dock_func.setTitleBarWidget(QLabel('图像操作'))
         self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_used = QDockWidget(self)
-        self.dock_used.setWidget(self.useListWidget)
+        self.dock_used.setWidget(self.useListWidget_LGE)
         self.dock_used.setTitleBarWidget(QLabel('已选操作'))
         self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_attr = QDockWidget(self)
-        self.dock_attr.setWidget(self.stackedWidget)
+        self.dock_attr.setWidget(self.stackedWidget_LGE)
         self.dock_attr.setTitleBarWidget(QLabel('属性'))
         self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.dock_attr.close()
@@ -153,45 +162,36 @@ class MyApp_LGE(QMainWindow):
         self.src_img = None
         self.cur_img = None
 
-    def contextMenuEvent(self, event):
-        print('save')
-        # if not self.has_photo():
-        #     print('no')
-        #     return
-        # print('save')
-        menu = QMenu()
-        save_action = QAction('另存为', self)
-        save_action.triggered.connect(self.save_current)  # 传递额外值
-        menu.addAction(save_action)
-        menu.exec(QCursor.pos())
-
-    def save_current(self):
-        img = self.process_image()
-        print('另存为')
-        file_name = QFileDialog.getSaveFileName(self, '另存为', './', 'Image files(*.nii.gz)')[0]
-        print(file_name)
-        if file_name:
-            nib.Nifti1Image(img, np.eye(4)).to_filename(file_name)
 
     def update_image(self):
+        print('update')
         if self.src_img is None:
             return
         img = self.process_image()
         self.cur_img = img
         # self.graphicsView.update_image(img)
-        self.LGEView.update_image(img)
+        self.LGEView.change_image(img)
 
     def change_image(self, img):
-        # self.src_img = img
-        # img = self.process_image()
-        # self.cur_img = img
+        print('src_img is True')
+        self.src_img = img
+        img = self.process_image()
+        self.cur_img = img
         # self.graphicsView.change_image(img)
         self.LGEView.change_image(img)
 
+    def change_label(self, label):
+        self.src_img = label
+        img = self.process_image()
+        self.cur_img = img
+        # self.graphicsView.change_image(img)
+        self.LGEView.change_label(label)
+
     def process_image(self):
+        print('process')
         img = self.src_img.copy()
-        for i in range(self.useListWidget.count()):
-            img = self.useListWidget.item(i)(img)
+        for i in range(self.useListWidget_LGE.count()):
+            img = self.useListWidget_LGE.item(i)(img)
         return img
 
     def right_rotate(self):
@@ -213,9 +213,9 @@ class MyApp_PETV(QMainWindow):
         self.action_left_rotate.triggered.connect(self.left_rotate)
         self.tool_bar.addActions((self.action_left_rotate, self.action_right_rotate))
 
-        self.useListWidget = UsedListWidget(self)
-        self.funcListWidget = FuncListWidget(self)
-        self.stackedWidget = StackedWidget(self)
+        self.UsedListWidget_4D = UsedListWidget_4D(self)
+        self.FuncListWidget_4D = FuncListWidget_4D(self)
+        self.StackedWidget_4D= StackedWidget_4D(self)
         self.fileSystemTreeView = FileSystemTreeView(self)
         self.PETViewer = PETViewer()
 
@@ -225,17 +225,17 @@ class MyApp_PETV(QMainWindow):
         self.dock_file.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_func = QDockWidget(self)
-        self.dock_func.setWidget(self.funcListWidget)
+        self.dock_func.setWidget(self.FuncListWidget_4D)
         self.dock_func.setTitleBarWidget(QLabel('图像操作'))
         self.dock_func.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_used = QDockWidget(self)
-        self.dock_used.setWidget(self.useListWidget)
+        self.dock_used.setWidget(self.UsedListWidget_4D)
         self.dock_used.setTitleBarWidget(QLabel('已选操作'))
         self.dock_used.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.dock_attr = QDockWidget(self)
-        self.dock_attr.setWidget(self.stackedWidget)
+        self.dock_attr.setWidget(self.StackedWidget_4D)
         self.dock_attr.setTitleBarWidget(QLabel('属性'))
         self.dock_attr.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.dock_attr.close()
@@ -251,25 +251,25 @@ class MyApp_PETV(QMainWindow):
         self.src_img = None
         self.cur_img = None
 
-
     def update_image(self):
         if self.src_img is None:
             return
         img = self.process_image()
         self.cur_img = img
-        self.PETViewer.update_image(img)
+        print(img.shape)
+        self.PETViewer.change_image(img)
 
     def change_image(self, img):
-        # self.src_img = img
-        # img = self.process_image()
-        # self.cur_img = img
-        # self.graphicsView.change_image(img)
+        self.src_img = img
+        img = self.process_image()
+        self.cur_img = img
+        # self.FuncListWidget_4D.change_image(img)
         self.PETViewer.change_image(img)
 
     def process_image(self):
         img = self.src_img.copy()
-        for i in range(self.useListWidget.count()):
-            img = self.useListWidget.item(i)(img)
+        for i in range(self.UsedListWidget_4D.count()):
+            img = self.UsedListWidget_4D.item(i)(img)
         return img
 
     def right_rotate(self):
@@ -339,9 +339,9 @@ class MyApp_RAW(QMainWindow):
         self.RAWView.update_image(img)
 
     def change_image(self, img):
-        # self.src_img = img
-        # img = self.process_image()
-        # self.cur_img = img
+        self.src_img = img
+        img = self.process_image()
+        self.cur_img = img
         # self.graphicsView.change_image(img)
         self.RAWView.change_image(img)
 
