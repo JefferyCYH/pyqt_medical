@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from config import items
+from RAWprocess.config_RAW import items
 
 
 class MyListWidget(QListWidget):
