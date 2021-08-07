@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import matplotlib.pyplot as plt
+from pandas import np
+
 from custom.stackedWidget import StackedWidget
 from custom.treeView import FileSystemTreeView
 from custom.listWidgets import FuncListWidget, UsedListWidget
@@ -10,7 +12,8 @@ from custom.graphicsView import GraphicsView
 from imageshow.LGEshow import LGEView
 from imageshow.PETVshow import PETViewer
 from imageshow.RAWshow import RAWView
-
+import SimpleITK as sitk
+import nibabel as nib
 
 class MyApp(QMainWindow):
     def __init__(self):
@@ -150,6 +153,25 @@ class MyApp_LGE(QMainWindow):
         self.src_img = None
         self.cur_img = None
 
+    def contextMenuEvent(self, event):
+        print('save')
+        # if not self.has_photo():
+        #     print('no')
+        #     return
+        # print('save')
+        menu = QMenu()
+        save_action = QAction('另存为', self)
+        save_action.triggered.connect(self.save_current)  # 传递额外值
+        menu.addAction(save_action)
+        menu.exec(QCursor.pos())
+
+    def save_current(self):
+        img = self.process_image()
+        print('另存为')
+        file_name = QFileDialog.getSaveFileName(self, '另存为', './', 'Image files(*.nii.gz)')[0]
+        print(file_name)
+        if file_name:
+            nib.Nifti1Image(img, np.eye(4)).to_filename(file_name)
 
     def update_image(self):
         if self.src_img is None:
