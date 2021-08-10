@@ -54,9 +54,9 @@ class TableWidget(QTableWidget):
         return param
 
 
-class WidthTableWidget(TableWidget):
+class SegTableWidget(TableWidget):
     def __init__(self, parent=None):
-        super(LightTableWidget, self).__init__(parent=parent)
+        super(SegTableWidget, self).__init__(parent=parent)
 
         self.alpha_spinBox = QDoubleSpinBox()
         self.alpha_spinBox.setMinimum(0)
@@ -79,7 +79,7 @@ class WidthTableWidget(TableWidget):
         self.signal_connect()
 
 
-class GammaITabelWidget(TableWidget):
+
     def __init__(self, parent=None):
         super(GammaITabelWidget, self).__init__(parent=parent)
         self.gamma_spinbox = QDoubleSpinBox()

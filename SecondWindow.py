@@ -301,6 +301,7 @@ class MyApp_RAW(QMainWindow):
         self.funcListWidget = FuncListWidget_RAW(self)
         self.stackedWidget = StackedWidget_RAW(self)
         self.fileSystemTreeView = FileSystemTreeView_RAW(self)
+        # self.RAWView = GraphicsView_RAW()
         self.RAWView = RAWView()
 
         self.dock_file = QDockWidget(self)
@@ -343,7 +344,7 @@ class MyApp_RAW(QMainWindow):
         img = self.process_image()
         self.cur_img = img
         # self.graphicsView.update_image(img)
-        self.RAWView.update_image(img)
+        self.RAWView.change_image(img)
 
     def change_image(self, img):
         self.src_img = img

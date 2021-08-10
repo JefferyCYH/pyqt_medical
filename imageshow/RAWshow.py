@@ -51,7 +51,7 @@ class SubLayout(QVBoxLayout):
 
         layout3 = QHBoxLayout()
         self.slidewidth = QSlider(Qt.Horizontal)
-        self.slidewidth.setMinimum(0)
+        self.slidewidth.setMinimum(1)
         self.slidewidth.setMaximum(1200)
         self.slidewidth.setSingleStep(1)
         self.slidewidth.valueChanged['int'].connect(self.changewidth)
@@ -59,7 +59,7 @@ class SubLayout(QVBoxLayout):
 
         layout4 = QHBoxLayout()
         self.slidecenter = QSlider(Qt.Horizontal)
-        self.slidecenter.setMinimum(0)
+        self.slidecenter.setMinimum(1)
         self.slidecenter.setMaximum(2400)
         self.slidecenter.setSingleStep(1)
         self.slidecenter.valueChanged['int'].connect(self.changecenter)

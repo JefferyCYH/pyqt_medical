@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 
 class GraphicsView_RAW(QGraphicsView):
     def __init__(self, parent=None):
-        super(GraphicsView, self).__init__(parent=parent)
+        super(GraphicsView_RAW, self).__init__(parent=parent)
         self._zoom = 0
         self._empty = True
         self._photo = QGraphicsPixmapItem()

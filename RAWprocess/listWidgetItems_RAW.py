@@ -3,6 +3,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QListWidgetItem, QPushButton
 from RAWprocess.flags_RAW import *
+from RAWprocess.eval import seg
 
 
 class MyItem(QListWidgetItem):
@@ -24,24 +25,10 @@ class MyItem(QListWidgetItem):
                 self.__setattr__('_' + k, v)
 
 
-class WidthItem(MyItem):
+class SegItem(MyItem):
     def __init__(self, parent=None):
-        super(WidthItem, self).__init__('窗宽调节', parent=parent)
-        self._alpha = 1
-        self._beta = 0
+        super(SegItem, self).__init__('分割', parent=parent)
 
     def __call__(self, img):
-        blank = np.zeros(img.shape, img.dtype)
-        img = cv2.addWeighted(img, self._alpha, blank, 1 - self._alpha, self._beta)
+        img = seg(img)
         return img
-
-
-class GammaItem(MyItem):
-    def __init__(self, parent=None):
-        super(GammaItem, self).__init__('伽马校正', parent=parent)
-        self._gamma = 1
-
-    def __call__(self, img):
-        gamma_table = [np.power(x / 255.0, self._gamma) * 255.0 for x in range(256)]
-        gamma_table = np.round(np.array(gamma_table)).astype(np.uint8)
-        return cv2.LUT(img, gamma_table)

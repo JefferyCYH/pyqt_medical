@@ -4,12 +4,10 @@ from RAWprocess.listWidgetItems_RAW import *
 
 # Implemented functions
 items = [
-    WidthItem,
-    GammaItem
+    SegItem
 ]
 
 tables = [
-    WidthTableWidget,
-    GammaITabelWidget
+    SegTableWidget
 ]
 
