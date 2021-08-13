@@ -1,6 +1,7 @@
 import numpy as np
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon, QColor
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QListWidgetItem, QPushButton, QGridLayout
 from PyQt5.QtWidgets import QWidget, QApplication, QGroupBox, QPushButton, QLabel, QHBoxLayout,  QVBoxLayout, QGridLayout, QFormLayout, QLineEdit, QTextEdit
 from skimage import exposure, img_as_float
@@ -133,8 +134,9 @@ class LabelItem(MyItem_4D):
     def __init__(self, parent=None):
         super(LabelItem, self).__init__('添加GT', parent=parent)
 
-
     def __call__(self, label):
+
+        # self.label = QtWidgets.QFileDialog.getOpenFileName(None, "选取文件","./", "All Files (*);;Text Files (*.txt)")
         # blank = np.zeros(img.shape, img.dtype)
         # img = cv2.addWeighted(img, self._alpha, blank, 1 - self._alpha, self._beta)
         return label
@@ -168,11 +170,14 @@ class ROIItem(MyItem_4D):
     def __init__(self, parent=None):
         super(ROIItem, self).__init__('ROI提取', parent=parent)
 
-    def __call__(self, img):
+
+    def __call__(self, img,label_path):
+
         # label_path=self.label_path_edit.text()
 
-        label_path='./image/patient001_frame01_gt.nii.gz'
+        # label_path='./image/patient001_frame01_gt.nii.gz'
         label=nib.load(label_path).get_data()
+        print("label_shape",label.shape)
         print("img_shape",img.shape)
         t,x,y,z=img.shape
         use_img=np.zeros((t,128,128,z))
