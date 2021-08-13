@@ -171,7 +171,7 @@ class ROIItem(MyItem_4D):
     def __call__(self, img):
         # label_path=self.label_path_edit.text()
 
-        label_path='D:/pyqt_medical-cy/image/patient001_frame01_gt.nii.gz'
+        label_path='./image/patient001_frame01_gt.nii.gz'
         label=nib.load(label_path).get_data()
         print("img_shape",img.shape)
         t,x,y,z=img.shape
