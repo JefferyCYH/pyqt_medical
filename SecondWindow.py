@@ -257,6 +257,12 @@ class MyApp_PETV(QMainWindow):
         self.setWindowIcon(QIcon('icons/main.png'))
         self.src_img = None
         self.cur_img = None
+        self.label=None
+    
+    def change_label(self,label):
+        self.label=label[0:-7]+'_gt.nii.gz'
+
+        print(self.label)
 
     def update_image(self):
         if self.src_img is None:
