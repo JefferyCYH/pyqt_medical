@@ -257,33 +257,39 @@ class MyApp_PETV(QMainWindow):
         self.setWindowIcon(QIcon('icons/main.png'))
         self.src_img = None
         self.cur_img = None
-        self.label=None
-    
-    def change_label(self,label):
-        self.label=label[0:-7]+'_gt.nii.gz'
-
-        print(self.label)
+        self.src_label=None
+        self.cur_label=None
 
     def update_image(self):
         if self.src_img is None:
             return
-        img = self.process_image()
+        img,label = self.process_image()
         self.cur_img = img
         print(img.shape)
         self.PETViewer.change_image(img)
 
     def change_image(self, img):
         self.src_img = img
-        img = self.process_image()
+        img,label = self.process_image()
         self.cur_img = img
+        self.cur_label=label
         # self.FuncListWidget_4D.change_image(img)
         self.PETViewer.change_image(img)
 
+    def change_label(self,label):
+        label=label[0:-7]+'_gt.nii.gz'
+        label=nib.load(label).get_data()
+        self.src_label=label
+        # img, label = self.process_image()
+        # self.cur_label=label
+
+
     def process_image(self):
         img = self.src_img.copy()
+        label=self.src_label.copy()
         for i in range(self.UsedListWidget_4D.count()):
-            img = self.UsedListWidget_4D.item(i)(img)
-        return img
+            img,label = self.UsedListWidget_4D.item(i)(img,label)
+        return img,label
 
     def right_rotate(self):
         self.PETViewer.rotate(90)
@@ -291,6 +297,7 @@ class MyApp_PETV(QMainWindow):
     def left_rotate(self):
         # self.graphicsView.rotate(-90)
         self.PETViewer.rotate(-90)
+
 
 class MyApp_RAW(QMainWindow):
     def __init__(self):
