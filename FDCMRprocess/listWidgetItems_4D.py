@@ -2,7 +2,7 @@ import numpy as np
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QListWidgetItem, QPushButton, QGridLayout
+from PyQt5.QtWidgets import QListWidgetItem, QPushButton, QGridLayout, QInputDialog,QLabel
 from PyQt5.QtWidgets import QWidget, QApplication, QGroupBox, QPushButton, QLabel, QHBoxLayout,  QVBoxLayout, QGridLayout, QFormLayout, QLineEdit, QTextEdit
 from skimage import exposure, img_as_float
 import torch.utils.data as Datas
@@ -11,6 +11,58 @@ import nibabel as nib
 import os
 import SimpleITK as sitk
 import torch
+def threshold(data):
+ data[np.where((0.5 > data))] = 0
+ data[np.where((0.5 <= data) & (data < 1.5))] = 1
+ data[np.where((1.5 <= data) & (data < 2.5))] = 2
+ data[np.where((2.5 <= data) & (data < 3.5))] = 3
+ return data
+
+def convert_to_one_hot(seg):
+    vals = np.unique(seg)
+    res = np.zeros([len(vals)] + list(seg.shape), seg.dtype)
+    for c in range(len(vals)):
+        res[c][seg == c] = 1
+    return res
+def dice(img1, img2, labels=None, nargout=1):
+ '''
+ Dice [1] volume overlap metric
+
+ The default is to *not* return a measure for the background layer (label = 0)
+
+ [1] Dice, Lee R. "Measures of the amount of ecologic association between species."
+ Ecology 26.3 (1945): 297-302.
+
+ Parameters
+ ----------
+ vol1 : nd array. The first volume (e.g. predicted volume)
+ vol2 : nd array. The second volume (e.g. "true" volume)
+ labels : optional vector of labels on which to compute Dice.
+     If this is not provided, Dice is computed on all non-background (non-0) labels
+ nargout : optional control of output arguments. if 1, output Dice measure(s).
+     if 2, output tuple of (Dice, labels)
+
+ Output
+ ------
+ if nargout == 1 : dice : vector of dice measures for each labels
+ if nargout == 2 : (dice, labels) : where labels is a vector of the labels on which
+     dice was computed
+ '''
+ if labels is None:
+  labels = np.unique(np.concatenate((img1, img2)))  # 输出一维数组
+  labels = np.delete(labels, np.where(labels == 0))  # remove background
+
+ dicem = np.zeros(len(labels))
+ for idx, lab in enumerate(labels):
+  top = 2 * np.sum(np.logical_and(img1 == lab, img2 == lab))
+  bottom = np.sum(img1 == lab) + np.sum(img2 == lab)
+  bottom = np.maximum(bottom, np.finfo(float).eps)  # add epsilon. 机器最小的正数
+  dicem[idx] = top / bottom
+
+ if nargout == 1:
+  return dicem
+ else:
+  return (dicem, labels)
 def Seg(img):
     print(img.shape)
     os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -81,6 +133,7 @@ def normor(image):
     return image
 
 def crop_img(label_es, img, box_height=128, box_width=128):
+
     print("crop_label",label_es.shape)
     print("crop_img",img.shape)
     a = label_es.nonzero()
@@ -107,9 +160,10 @@ def crop_img(label_es, img, box_height=128, box_width=128):
         a_y_end=box_width
 
     img_1 = img[a_x_start:a_x_end, a_y_start:a_y_end, :]
+    label_res=label_es[a_x_start:a_x_end, a_y_start:a_y_end, :]
     print('img1',img_1.shape)
     #plt.imshow(img_1[:,:,5], cmap='gray')
-    return img_1
+    return img_1,label_res
 
 class MyItem_4D(QListWidgetItem):
     def __init__(self, name=None, parent=None):
@@ -153,46 +207,64 @@ class NormItem(MyItem_4D):
 
 class LightItem(MyItem_4D):
     def __init__(self, parent=None):
-        super(LightItem, self).__init__('亮度', parent=parent)
-        self.alpha = 1
+        super(LightItem, self).__init__('Dice', parent=parent)
 
-    def __call__(self, img):
-        img = img_as_float(img)
-        if (self.alpha <=1 & self.alpha >0):
-            img = exposure.adjust_gamma(img, self.alpha)  # 图片调暗
-        elif (self.alpha > 1):
-            img = exposure.adjust_gamma(img, 0.5)  # 图片调亮
-        else:
-            print('请输入大于0的数字！')
-        return img
+    def __call__(self, img,label):
+
+        test_img=img[0,:,:,:]
+        test_img=threshold(test_img)
+        test_img=convert_to_one_hot(test_img)
+        test_label=threshold(label)
+        test_label=convert_to_one_hot(test_label)
+        test_img=test_img[np.newaxis,:,:,:,:]
+        test_label = test_label[np.newaxis, :, :, :, :]
+        print("test_labelshape", test_label.shape)
+        print("test_imgshape", test_img.shape)
+        mm1 = test_img[0, 1, :, :, :] * 1 + test_img[0, 2, :, :, :] * 2 + test_img[0, 3, :, :, :] * 3
+        mm2 = test_label[0, 1, :, :, :] * 1 + test_label[0, 2, :, :, :] * 2 + test_label[0, 3, :, :, :] * 3
+        testdice = dice(mm1, mm2, nargout=1)
+        print(testdice)
+        # self.label_1 = QLabel(self)
+        # self.label_1.setText(self,'右心室：'+str(testdice[0])+'左心肌：'+str(testdice[1])+'左心室：'+str(testdice[2]))
+
+
+        return img,label
 
 class ROIItem(MyItem_4D):
     def __init__(self, parent=None):
         super(ROIItem, self).__init__('ROI提取', parent=parent)
 
 
-    def __call__(self, img,label_path):
+    def __call__(self, img,label):
 
         # label_path=self.label_path_edit.text()
 
         # label_path='./image/patient001_frame01_gt.nii.gz'
-        label=nib.load(label_path).get_data()
+
+        # label=nib.load(label_path).get_data()
         print("label_shape",label.shape)
         print("img_shape",img.shape)
         t,x,y,z=img.shape
+
         use_img=np.zeros((t,128,128,z))
+        use_label=np.zeros((128,128,z))
         for i in range(0,t):
-            cur_img=crop_img(label_es=label,img=img[i,:,:,:],box_height=128,box_width=128)
+            cur_img,use_label=crop_img(label_es=label,img=img[i,:,:,:],box_height=128,box_width=128)
             use_img[i,:,:,:]=cur_img
 
 
-        return use_img
+        return use_img, use_label
+            # label=use_label
+
+
+
+
 
 class RegItem(MyItem_4D):
     def __init__(self, parent=None):
         super(RegItem, self).__init__('配准', parent=parent)
 
-    def __call__(self, img):
+    def __call__(self, img,label):
         # path='./image/_es.nii.gz'
         # fix=nib.load(path).get_data()
         # pet_image = sitk.ReadImage(img)
@@ -209,12 +281,12 @@ class RegItem(MyItem_4D):
             wrap=Reg(mov,fix)
             wrap = np.transpose(wrap, (2, 1, 0))  # zyx-xyz
             use_img[i, :, :, :] = wrap
-        return use_img
+        return use_img,label
 
 class SegItem(MyItem_4D):
     def __init__(self, parent=None):
         super(SegItem, self).__init__('分割', parent=parent)
-    def __call__(self, img):
+    def __call__(self, img,label):
         img = np.transpose(img, (0,3, 2, 1))  # txyz-tzyx
         t, z, y, x = img.shape
         use_img=np.zeros((t,x,y,z))
@@ -227,7 +299,7 @@ class SegItem(MyItem_4D):
             cur_img=np.transpose(cur_img,(2,1,0))#zyx-xyz
             use_img[i,:,:,:]=cur_img
 
-        return use_img
+        return use_img,label
 
 
 
