@@ -1,14 +1,13 @@
 import numpy as np
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QListWidgetItem, QPushButton, QGridLayout, QInputDialog,QLabel
-from PyQt5.QtWidgets import QWidget, QApplication, QGroupBox, QPushButton, QLabel, QHBoxLayout,  QVBoxLayout, QGridLayout, QFormLayout, QLineEdit, QTextEdit
-from skimage import exposure, img_as_float
 import torch.utils.data as Datas
 from FDCMRprocess import Network as Network
 import nibabel as nib
 import os
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 import SimpleITK as sitk
 import torch
 def threshold(data):
@@ -209,6 +208,7 @@ class LightItem(MyItem_4D):
     def __init__(self, parent=None):
         super(LightItem, self).__init__('Dice', parent=parent)
 
+
     def __call__(self, img,label):
 
         test_img=img[0,:,:,:]
@@ -224,11 +224,19 @@ class LightItem(MyItem_4D):
         mm2 = test_label[0, 1, :, :, :] * 1 + test_label[0, 2, :, :, :] * 2 + test_label[0, 3, :, :, :] * 3
         testdice = dice(mm1, mm2, nargout=1)
         print(testdice)
+        self.showmsg(testdice)
+
+
         # self.label_1 = QLabel(self)
         # self.label_1.setText(self,'右心室：'+str(testdice[0])+'左心肌：'+str(testdice[1])+'左心室：'+str(testdice[2]))
 
 
         return img,label
+
+    def showmsg(self,testdice):
+        QMessageBox.information(None, 'Dice计算',
+                                '右心室：' + str(testdice[0]) + '左心肌：' + str(testdice[1]) + '左心室：' + str(testdice[2]),
+                                QMessageBox.Yes | QMessageBox.No)
 
 class ROIItem(MyItem_4D):
     def __init__(self, parent=None):
