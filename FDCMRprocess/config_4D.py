@@ -5,11 +5,12 @@ from FDCMRprocess.listWidgetItems_4D import *
 # Implemented functions
 items = [
     LabelItem,
-    NormItem,
-    LightItem,
     ROIItem,
     RegItem,
     SegItem,
+    LightItem,
+    HDItem,
+    NormItem,
 ]
 
 tables = [
