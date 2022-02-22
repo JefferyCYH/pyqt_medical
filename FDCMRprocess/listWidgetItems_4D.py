@@ -10,6 +10,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import SimpleITK as sitk
 import torch
+import hausdorff as hs
+import xlrd
+import xlwt
+from xlutils.copy import copy
 def threshold(data):
  data[np.where((0.5 > data))] = 0
  data[np.where((0.5 <= data) & (data < 1.5))] = 1
@@ -17,6 +21,22 @@ def threshold(data):
  data[np.where((2.5 <= data) & (data < 3.5))] = 3
  return data
 
+def JaccardSimilarity(docVector1, docVector2):
+    dotProduct = 0.0
+    magnitude1 = 0.0
+    magnitude2 = 0.0
+    jaccardSimilarity = 0.0
+
+    for i in range(0, len(docVector1) - 1):
+        dotProduct += docVector1[i] * docVector2[i]
+        magnitude1 += np.power(docVector1[i], 2)
+        magnitude2 += np.power(docVector2[i], 2)
+    # end for
+
+    if(magnitude1 != 0.0 and magnitude2 != 0.0):
+        jaccardSimilarity = dotProduct / (magnitude1 + magnitude2 - dotProduct)
+
+    return jaccardSimilarity
 def convert_to_one_hot(seg):
     vals = np.unique(seg)
     res = np.zeros([len(vals)] + list(seg.shape), seg.dtype)
@@ -62,6 +82,8 @@ def dice(img1, img2, labels=None, nargout=1):
   return dicem
  else:
   return (dicem, labels)
+
+
 def Seg(img):
     print(img.shape)
     os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -183,26 +205,47 @@ class MyItem_4D(QListWidgetItem):
             if '_' + k in dir(self):
                 self.__setattr__('_' + k, v)
 
+
+class Child(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("我是子窗口啊")
+
+
 class LabelItem(MyItem_4D):
     def __init__(self, parent=None):
-        super(LabelItem, self).__init__('添加GT', parent=parent)
+        super(LabelItem, self).__init__('旋转', parent=parent)
+        child_window = Child()
+        child_window.show()
 
-    def __call__(self, label):
+
+    # def __call__(self, label):
+
 
         # self.label = QtWidgets.QFileDialog.getOpenFileName(None, "选取文件","./", "All Files (*);;Text Files (*.txt)")
         # blank = np.zeros(img.shape, img.dtype)
         # img = cv2.addWeighted(img, self._alpha, blank, 1 - self._alpha, self._beta)
-        return label
 
 class NormItem(MyItem_4D):
     def __init__(self, parent=None):
-        super(NormItem, self).__init__('归一化', parent=parent)
+        super(NormItem, self).__init__('存储当前结果', parent=parent)
 
-    def __call__(self, img):
-        max = img.max()
-        min = img.min()
-        img = (img - min) / (max - min)
-        return img
+    def __call__(self, img, label):
+        out = sitk.GetImageFromArray(img)
+
+        sitk.WriteImage(out, './result/patient001_4d_res' + '.nii')
+
+        return img, label
+
+
+
+
+    #
+    # def __call__(self, img):
+    #     max = img.max()
+    #     min = img.min()
+    #     img = (img - min) / (max - min)
+    #     return img
 
 class LightItem(MyItem_4D):
     def __init__(self, parent=None):
@@ -233,10 +276,62 @@ class LightItem(MyItem_4D):
 
         return img,label
 
-    def showmsg(self,testdice):
+    def showmsg(self, testdice):
         QMessageBox.information(None, 'Dice计算',
                                 '右心室：' + str(testdice[0]) + '左心肌：' + str(testdice[1]) + '左心室：' + str(testdice[2]),
                                 QMessageBox.Yes | QMessageBox.No)
+        excel_path='./result/result.xls'
+        myexcel=xlrd.open_workbook(excel_path)
+        new_wb = copy(myexcel)
+        new_sheet = new_wb.get_sheet('Sheet1')
+        new_sheet.write(1,0,'patient001')
+        new_sheet.write(1,1,'DICE')
+        new_sheet.write(1,2,str(testdice))
+        new_wb.save(excel_path)
+
+
+class HDItem(MyItem_4D):
+    def __init__(self, parent=None):
+            super(HDItem, self).__init__('Jaccard', parent=parent)
+
+    def __call__(self, img, label):
+            test_img = img[0, :, :, :]
+            test_img = threshold(test_img)
+            test_img = convert_to_one_hot(test_img)
+            test_label = threshold(label)
+            test_label = convert_to_one_hot(test_label)
+
+            test_img = test_img[np.newaxis, :, :, :, :]
+            test_label = test_label[np.newaxis, :, :, :, :]
+            print("test_labelshape", test_label.shape)
+            print("test_imgshape", test_img.shape)
+            mm1 = test_img[0, 1, :, :, :] * 1 + test_img[0, 2, :, :, :] * 2 + test_img[0, 3, :, :, :] * 3
+            mm2 = test_label[0, 1, :, :, :] * 1 + test_label[0, 2, :, :, :] * 2 + test_label[0, 3, :, :, :] * 3
+            segj = mm1.flatten()
+            labj = mm2.flatten()
+            js = JaccardSimilarity(labj, segj)
+
+            print(js)
+            self.showmsg2(js)
+
+
+            # self.label_1 = QLabel(self)
+            # self.label_1.setText(self,'右心室：'+str(testdice[0])+'左心肌：'+str(testdice[1])+'左心室：'+str(testdice[2]))
+
+            return img, label
+
+    def showmsg2(self,hsv):
+        QMessageBox.information(None, 'JS计算',
+                                'JS指标：' + str(hsv) ,
+                                QMessageBox.Yes | QMessageBox.No)
+        excel_path = './result/result.xls'
+        myexcel = xlrd.open_workbook(excel_path)
+        new_wb = copy(myexcel)
+        new_sheet = new_wb.get_sheet('Sheet1')
+        new_sheet.write(2, 0, 'patient001')
+        new_sheet.write(2, 1, 'Jaccard')
+        new_sheet.write(2, 2, str(hsv))
+        new_wb.save(excel_path)
 
 class ROIItem(MyItem_4D):
     def __init__(self, parent=None):
