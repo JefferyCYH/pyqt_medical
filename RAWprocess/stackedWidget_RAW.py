@@ -1,5 +1,6 @@
-from custom.tableWidget import *
-from config import tables
+from RAWprocess.tableWidget_RAW import *
+from RAWprocess.config_RAW import tables
+
 
 
 class StackedWidget_RAW(QStackedWidget):

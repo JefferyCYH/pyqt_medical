@@ -46,5 +46,5 @@ class ContrastratioItem(MyItem):
         super(ContrastratioItem, self).__init__('对比度调节', parent=parent)
 
     def __call__(self, img):
-        img = seg(img)
+        img = img+200
         return img

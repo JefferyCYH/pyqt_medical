@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
 
         # 下拉菜单
         self.demo_box = QComboBox(self)
-        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'PETV', 3:"肾脏"}
+        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'PETV', 3:"肾脏图像处理"}
 
         # 图像
         self.label_show_camera = QLabel()
@@ -45,10 +45,10 @@ class MainWindow(QMainWindow):
                                  "border-radius:5px;}"
                                  "QPushButton:hover{background:#E0E0E0;}"
                                  "QPushButton:pressed{background:#D0D0D0;}")
-            button.setFixedSize(100, 30)
+            button.setFixedSize(120, 30)
 
         # 美化下拉菜单
-        self.demo_box.setFixedSize(100, 30)
+        self.demo_box.setFixedSize(120, 30)
         # self.demo_box.addItems(['PNG', 'LGE', '肾脏CT'])
         self.demo_box.addItems([self.dictType.get(0), self.dictType.get(1), self.dictType.get(2), self.dictType.get(3)])
         # self.demo_box.currentIndexChanged[str].connect(self.listchange)
@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
             # MainWindow.close(self)
             self.PETVwindow.show()
         
-        elif self.demo_box.currentText() == '肾脏':
+        elif self.demo_box.currentText() == '肾脏图像处理':
             self.RAWwindow = MyApp_RAW()
             # MainWindow.close(self)
             self.RAWwindow.show()

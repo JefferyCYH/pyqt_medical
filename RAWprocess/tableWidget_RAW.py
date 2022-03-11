@@ -58,70 +58,11 @@ class SegTableWidget(TableWidget):
     def __init__(self, parent=None):
         super(SegTableWidget, self).__init__(parent=parent)
 
-        self.alpha_spinBox = QDoubleSpinBox()
-        self.alpha_spinBox.setMinimum(0)
-        self.alpha_spinBox.setMaximum(3)
-        self.alpha_spinBox.setSingleStep(0.1)
-        self.alpha_spinBox.setObjectName('alpha')
-
-        self.beta_spinbox = QSpinBox()
-        self.beta_spinbox.setMinimum(0)
-        self.beta_spinbox.setSingleStep(1)
-        self.beta_spinbox.setObjectName('beta')
-
-        self.setColumnCount(2)
-        self.setRowCount(2)
-
-        self.setItem(0, 0, QTableWidgetItem('alpha'))
-        self.setCellWidget(0, 1, self.alpha_spinBox)
-        self.setItem(1, 0, QTableWidgetItem('beta'))
-        self.setCellWidget(1, 1, self.beta_spinbox)
-        self.signal_connect()
 
 class GrayscaleTableWidget(TableWidget):
     def __init__(self, parent=None):
         super(GrayscaleTableWidget, self).__init__(parent=parent)
 
-        self.alpha_spinBox = QDoubleSpinBox()
-        self.alpha_spinBox.setMinimum(0)
-        self.alpha_spinBox.setMaximum(3)
-        self.alpha_spinBox.setSingleStep(0.1)
-        self.alpha_spinBox.setObjectName('alpha')
-
-        self.beta_spinbox = QSpinBox()
-        self.beta_spinbox.setMinimum(0)
-        self.beta_spinbox.setSingleStep(1)
-        self.beta_spinbox.setObjectName('beta')
-
-        self.setColumnCount(2)
-        self.setRowCount(2)
-
-        self.setItem(0, 0, QTableWidgetItem('alpha'))
-        self.setCellWidget(0, 1, self.alpha_spinBox)
-        self.setItem(1, 0, QTableWidgetItem('beta'))
-        self.setCellWidget(1, 1, self.beta_spinbox)
-        self.signal_connect()
-
 class ContrastratioTableWidget(TableWidget):
     def __init__(self, parent=None):
         super(ContrastraioTableWidget, self).__init__(parent=parent)
-
-        self.alpha_spinBox = QDoubleSpinBox()
-        self.alpha_spinBox.setMinimum(0)
-        self.alpha_spinBox.setMaximum(3)
-        self.alpha_spinBox.setSingleStep(0.1)
-        self.alpha_spinBox.setObjectName('alpha')
-
-        self.beta_spinbox = QSpinBox()
-        self.beta_spinbox.setMinimum(0)
-        self.beta_spinbox.setSingleStep(1)
-        self.beta_spinbox.setObjectName('beta')
-
-        self.setColumnCount(2)
-        self.setRowCount(2)
-
-        self.setItem(0, 0, QTableWidgetItem('alpha'))
-        self.setCellWidget(0, 1, self.alpha_spinBox)
-        self.setItem(1, 0, QTableWidgetItem('beta'))
-        self.setCellWidget(1, 1, self.beta_spinbox)
-        self.signal_connect()
