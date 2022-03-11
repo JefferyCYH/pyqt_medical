@@ -4,10 +4,14 @@ from RAWprocess.listWidgetItems_RAW import *
 
 # Implemented functions
 items = [
-    SegItem
+    SegItem,
+    GrayscaleItem,
+    ContrastratioItem,
 ]
 
 tables = [
-    SegTableWidget
+    SegTableWidget,
+    GrayscaleTableWidget,
+    ContrastratioTableWidget,
 ]
 

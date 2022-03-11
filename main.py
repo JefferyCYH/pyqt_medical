@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
 
         # 下拉菜单
         self.demo_box = QComboBox(self)
-        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'PETV', 3:"RAW"}
+        self.dictType = {0: 'PNG', 1: 'LGE', 2: 'PETV', 3:"肾脏"}
 
         # 图像
         self.label_show_camera = QLabel()
@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
             # MainWindow.close(self)
             self.PETVwindow.show()
         
-        elif self.demo_box.currentText() == 'RAW':
+        elif self.demo_box.currentText() == '肾脏':
             self.RAWwindow = MyApp_RAW()
             # MainWindow.close(self)
             self.RAWwindow.show()

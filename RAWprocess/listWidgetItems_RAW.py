@@ -32,3 +32,19 @@ class SegItem(MyItem):
     def __call__(self, img):
         img = seg(img)
         return img
+
+class GrayscaleItem(MyItem):
+    def __init__(self, parent=None):
+        super(GrayscaleItem, self).__init__('灰度调节', parent=parent)
+
+    def __call__(self, img):
+        img = img+200
+        return img
+
+class ContrastratioItem(MyItem):
+    def __init__(self, parent=None):
+        super(ContrastratioItem, self).__init__('对比度调节', parent=parent)
+
+    def __call__(self, img):
+        img = seg(img)
+        return img

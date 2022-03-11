@@ -57,7 +57,6 @@ class TableWidget(QTableWidget):
 class GrayingTableWidget(TableWidget):
     def __init__(self, parent=None):
         super(GrayingTableWidget, self).__init__(parent=parent)
-        print('GrayingTableWidget')
 
 
 class FilterTabledWidget(TableWidget):
