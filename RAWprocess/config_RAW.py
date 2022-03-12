@@ -9,12 +9,16 @@ from RAWprocess.listWidgetItems_RAW import *
 items = [
     SegItem,
     GrayscaleItem,
-    ContrastratioItem,
+    ContrastItem,
+    CutItem,
+    SaveItem,
 ]
 
 tables = [
     SegTableWidget,
     GrayscaleTableWidget,
-    ContrastratioTableWidget,
+    ContrastTableWidget,
+    CutTableWidget,
+    SaveTableWidget,
 ]
 

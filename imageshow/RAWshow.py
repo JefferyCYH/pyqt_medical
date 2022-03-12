@@ -119,6 +119,8 @@ class PlotCanvas(FigureCanvas):
     def plot(self, arr, value, windowcenter, windowwidth, cmap='gray'):
         self.fig.clear()
         ax = self.fig.add_subplot(111)
+        if value >= arr.shape[0]:
+            value = arr.shape[0]-1
         slice = arr[value, :, :]
         slice = np.transpose(slice)
         slicediv = np.max(slice)-np.min(slice)
